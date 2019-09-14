@@ -8,4 +8,4 @@ x = torch.rand(5, 3)
 print(x)
 
 x = torch.zeros(5, 3, dtype=torch.long)
-print(x, "DUPA")
+print(x, "")
