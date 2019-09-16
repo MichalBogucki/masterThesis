@@ -1,7 +1,11 @@
 from __future__ import print_function
 import torch
 
-from SourceCode.pRo import printLoss
+from SourceCode.JustinJohnson._1_warmUp.pRo import printLoss
+
+from datetime import datetime
+
+start_time = datetime.now()
 
 dtype = torch.float
 device = torch.device("cuda:0")
@@ -39,3 +43,13 @@ for t in range(500):
     # Update weights using gradient descent
     w1 -= learningRate * gradW1
     w2 -= learningRate * gradW2
+
+
+
+
+
+# INSERT YOUR CODE
+
+time_elapsed = datetime.now() - start_time
+
+print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))

@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+SourceCode/officialPytorch/data/MNIST/processed/test.pt
+SourceCode/officialPytorch/data/MNIST/processed/training.pt
+SourceCode/officialPytorch/data/MNIST/raw/t10k-images-idx3-ubyte
+SourceCode/officialPytorch/data/MNIST/raw/t10k-labels-idx1-ubyte
+SourceCode/officialPytorch/data/MNIST/raw/train-images-idx3-ubyte
+SourceCode/officialPytorch/data/MNIST/raw/train-labels-idx1-ubyte
