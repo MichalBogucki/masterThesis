@@ -5,6 +5,17 @@ from SourceCode.JustinJohnson._1_warmUp.pRo import printLoss
 
 from datetime import datetime
 
+import matplotlib
+#matplotlib.matplotlib_fname()
+
+import matplotlib.pyplot as p
+
+p.plot(range(20),range(20))
+
+p.show()
+
+
+
 start_time = datetime.now()
 
 dtype = torch.float
@@ -53,3 +64,4 @@ for t in range(500):
 time_elapsed = datetime.now() - start_time
 
 print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
+

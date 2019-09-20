@@ -20,10 +20,10 @@ transform = transforms.Compose([transforms.ToTensor(),
 
 # Download and load the training data
 # wskaznik bezposrednio na folder z MINSTem -> SourceCode/MnistGithub/SourceCode/MnistGithub/Data/ { MNIST } /...
-trainset = datasets.MNIST('SourceCode/MnistGithub/Data', download=False, train=True, transform=transform)
-valset = datasets.MNIST('SourceCode/MnistGithub/Data', download=False, train=False, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
-valloader = torch.utils.data.DataLoader(valset, batch_size=64, shuffle=True)
+trainset = datasets.MNIST('../officialPytorch/data/', download=False, train=True, transform=transform)
+valset = datasets.MNIST('../officialPytorch/data/', download=False, train=False, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True, num_workers=3, pin_memory=True)
+valloader = torch.utils.data.DataLoader(valset, batch_size=64, shuffle=True, num_workers=3, pin_memory=True)
 
 ### --------------------------
 ### Exploring the data
@@ -100,7 +100,7 @@ print('Updated weights - ', model[0].weight)
 ### Core Training Of Neural Network
 optimizer = optim.SGD(model.parameters(), lr=0.003, momentum=0.9)
 time0 = time()
-epochs = 15
+epochs = 10
 for e in range(epochs):
     running_loss = 0
     for images, labels in trainloader:
@@ -121,7 +121,7 @@ for e in range(epochs):
 
         running_loss += loss.item()
     else:
-        print("Epoch {} - Training loss: {}".format(e, running_loss / len(trainloader)))
+        print("Epoch [{}/{}] - Training loss: {}".format(e,epochs, running_loss / len(trainloader)))
 print("\nTraining Time (in minutes) =", (time() - time0) / 60)
 
 
@@ -140,18 +140,6 @@ def view_classify(img, ps):
     ax2.set_title('Class Probability')
     ax2.set_xlim(0, 1.1)
     plt.tight_layout()
-
-images, labels = next(iter(valloader))
-img = images[0].view(1, 784)
-# Turn off gradients to speed up this part
-with torch.no_grad():
-    logps = model(img.cuda())
-
-# Output of the network are log-probabilities, need to take exponential for probabilities
-ps = torch.exp(logps)
-probab = list(ps.cpu().numpy()[0])
-print("Predicted Digit =", probab.index(max(probab)))
-view_classify(img.view(1, 28, 28), ps)
 
 
 ### --------------------------
@@ -175,3 +163,15 @@ for images, labels in valloader:
 
 print("Number Of Images Tested =", all_count)
 print("\nModel Accuracy =", (correct_count / all_count))
+
+images, labels = next(iter(valloader))
+img = images[0].view(1, 784)
+# Turn off gradients to speed up this part
+with torch.no_grad():
+    logps = model(img.cuda())
+
+# Output of the network are log-probabilities, need to take exponential for probabilities
+ps = torch.exp(logps)
+probab = list(ps.cpu().numpy()[0])
+print("Predicted Digit =", probab.index(max(probab)))
+view_classify(img.view(1, 28, 28), ps)
