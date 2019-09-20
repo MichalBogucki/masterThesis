@@ -93,7 +93,7 @@ def main():
 
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    kwargs = {'num_workers': 2, 'pin_memory': True} if use_cuda else {}
     # train_loader = torch.utils.data.DataLoader(
     #     datasets.MNIST('../data', train=True, download=True,
     #                    transform=transforms.Compose([
@@ -129,8 +129,12 @@ def main():
 if __name__ == '__main__':
     main()
 
+
+
 # INSERT YOUR CODE
 time_elapsed = datetime.now() - start_time
 
 print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
-print("laptop \n Time elapsed (hh:mm:ss.ms) 0:03:05.018190")
+print("pc_czarny \n Time elapsed (hh:mm:ss.ms) 0:02:05.02146")
+print("laptop \n Time elapsed (hh:mm:ss.ms) 0:02:56.188259")
+print("bestia \n Time elapsed (hh:mm:ss.ms) 0:01:16.143156")
