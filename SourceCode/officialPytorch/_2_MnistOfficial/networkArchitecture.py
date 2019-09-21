@@ -1,5 +1,7 @@
+import torch
 from torch import nn as nn
 from torch.nn import functional as F
+
 
 class NetworkArchitecture(nn.Module):
     def __init__(self):
@@ -18,3 +20,12 @@ class NetworkArchitecture(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+
+
+def loadTrainedModel(model):
+    model.load_state_dict(torch.load("savedModel/mnist_cnn.pt"))
+
+
+def saveTrainedModel(args, model):
+    if (args.save_model):
+        torch.save(model.state_dict(), "savedModel/mnist_cnn.pt")

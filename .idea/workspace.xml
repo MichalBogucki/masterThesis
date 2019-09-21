@@ -2,21 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa0404dc-6eda-49ac-afc4-56e3d4235391" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/NetworkArchitecture.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/savedModel/mnist_cnn.pt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/setParserArguments.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/testModel.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/timer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/trainModel.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/view_classify.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/EITI_masterThesis.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/EITI_masterThesis.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/0.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/5.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/6.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/9.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/merged_2x8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/saveimagesFromTensor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/showImagesOnGrid_8xY.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/showPlotImages.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/HelloWorld.py" beforeDir="false" afterPath="$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/HelloWorld.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceCode/MnistGithub/MnstGithub.py" beforeDir="false" afterPath="$PROJECT_DIR$/SourceCode/MnistGithub/MnstGithub.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py" beforeDir="false" afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/view_classify.py" beforeDir="false" afterPath="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/viewClassify.py" afterDir="false" />
     </list>
     <ignored path="SourceCode/officialPytorch/data/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -26,74 +29,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/MnistGithub/MnstGithub.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" selection-start-line="2" selection-end-line="3" selection-end-column="18" />
-              <folding>
-                <element signature="e#61#79#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="46" column="61" selection-start-line="46" selection-start-column="56" selection-end-line="46" selection-end-column="61" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
+    <leaf>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/view_classify.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/NetworkArchitecture.py">
+        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/Main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
-              <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/setParserArguments.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/trainModel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="36" lean-forward="true" selection-start-column="36" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/testModel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="12" selection-start-column="12" selection-end-column="12" />
+              <caret line="1" column="27" selection-start-line="1" selection-start-column="27" selection-end-line="1" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -132,6 +73,7 @@
       <find>trans</find>
       <find>view</find>
       <find>model</find>
+      <find>pred</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -148,21 +90,38 @@
         <option value="$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/pRo.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/HelloWorld.py" />
         <option value="$PROJECT_DIR$/SourceCode/MnistGithub/MnstGithub.py" />
-        <option value="$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/HelloWorld.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/ViewClass.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/__init__.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/trainModel.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/testModel.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/NetworkArchitecture.py" />
-        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py" />
         <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/view_classify.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/viewClassify.py" />
+        <option value="$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/HelloWorld.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/setLoader.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/saveimagesFromTensor.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/showImagesOnGrid_8xY.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/showPlotImages.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/timer.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MainMnistOfficial.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/networkArchitecture.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/testModel.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/setParserArguments.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/saveimagesFromTensor.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showExecutionTime.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/networkArchitecture.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showImagesOnGrid_8xY.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showPlotImages.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/useImages.py" />
+        <option value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/Main.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="731" />
-    <option name="width" value="647" />
-    <option name="height" value="735" />
+    <option name="x" value="786" />
+    <option name="width" value="1135" />
+    <option name="height" value="1040" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -172,6 +131,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -214,7 +174,7 @@
               <item name="Eiti_masterThesis" type="462c0819:PsiDirectoryNode" />
               <item name="SourceCode" type="462c0819:PsiDirectoryNode" />
               <item name="officialPytorch" type="462c0819:PsiDirectoryNode" />
-              <item name="_2_autograd" type="462c0819:PsiDirectoryNode" />
+              <item name="_2_MnistOfficial" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Eiti_masterThesis" type="b2602c69:ProjectViewProjectNode" />
@@ -222,20 +182,11 @@
               <item name="SourceCode" type="462c0819:PsiDirectoryNode" />
               <item name="officialPytorch" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Eiti_masterThesis" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Eiti_masterThesis" type="462c0819:PsiDirectoryNode" />
-              <item name="SourceCode" type="462c0819:PsiDirectoryNode" />
-              <item name="officialPytorch" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="MNIST" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -303,12 +254,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/Main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -340,8 +290,8 @@
     </configuration>
     <list>
       <item itemvalue="Python.HelloWorld" />
-      <item itemvalue="Python.MnistOfficial" />
       <item itemvalue="Python.MnstGithub" />
+      <item itemvalue="Python.MnistOfficial" />
     </list>
     <recent_temporary>
       <list>
@@ -386,13 +336,13 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18336888" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14712153" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.23185265" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39869988" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.26218852" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.36403033" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -401,7 +351,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" />
-      <window_info anchor="bottom" id="Python Console" order="12" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -421,13 +371,6 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/SourceCode/printLoss.py" />
     <entry file="file://$PROJECT_DIR$/SourceCode/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/pRo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/HelloWorld.py" />
     <entry file="file://C:/ProgramData/Anaconda3/Lib/tokenize.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -457,74 +400,146 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/__init__.py" />
     <entry file="file://$PROJECT_DIR$/SourceCode/MnistGithub/MnstGithub.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="3" selection-end-column="18" />
+        <state relative-caret-position="-1448">
+          <caret line="54" column="5" selection-start-line="54" selection-end-line="54" selection-end-column="5" />
           <folding>
             <element signature="e#61#79#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/pRo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/6.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/0.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/1.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/2.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/3.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/4.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/5.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/7.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/8.png" />
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/9.png" />
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/matplotlib/pyplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="2642" column="4" selection-start-line="2642" selection-start-column="4" selection-end-line="2642" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/SourceCode/JustinJohnson/_1_warmUp/HelloWorld.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-315">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="76" lean-forward="true" selection-start-column="76" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/trainModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="36" lean-forward="true" selection-start-column="36" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/testModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" selection-start-column="12" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/NetworkArchitecture.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/setParserArguments.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/MnistOfficial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="46" column="61" selection-start-line="46" selection-start-column="56" selection-end-line="46" selection-end-column="61" />
+        <state relative-caret-position="238">
+          <caret line="14" column="51" lean-forward="true" selection-start-line="14" selection-start-column="51" selection-end-line="14" selection-end-column="51" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/view_classify.py">
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_autograd/imagesFromTensor/0_th.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/viewClassify.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
+        <state relative-caret-position="4">
+          <caret line="6" column="8" lean-forward="true" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/testModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="14" selection-start-line="13" selection-start-column="14" selection-end-line="13" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showPlotImages.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showImagesOnGrid_8xY.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/networkArchitecture.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="23" lean-forward="true" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#6#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/setLoader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/setParserArguments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="30" lean-forward="true" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/showExecutionTime.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/trainModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="74" lean-forward="true" selection-start-line="15" selection-start-column="74" selection-end-line="15" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/useImages.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SourceCode/officialPytorch/_2_MnistOfficial/Main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="27" selection-start-line="1" selection-start-column="27" selection-end-line="1" selection-end-column="27" />
         </state>
       </provider>
     </entry>
