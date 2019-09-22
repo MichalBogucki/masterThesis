@@ -28,7 +28,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     for epoch in range(1, args.epochs + 1):
-        # images, labels = next(iter(testLoader))
+        # images, labels = next(iter(testLoader)) # ToDo -- na laptopie wyswietla ploty poprawnie
         # showPlotImages(images)  # ToDo -- Showing plot stops code execution until the figure will be closed
         # saveImagesFromTensor(images, labels)
         # trainModel(args, model, device, trainLoader, optimizer, epoch)
