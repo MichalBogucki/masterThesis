@@ -7,7 +7,9 @@ from setParserArguments import setParserArguments
 from trainModel import *
 from testModel import *
 from showExecutionTime import *
+from efficientnet_pytorch import EfficientNet
 
+model = EfficientNet.from_name('efficientnet-b0')
 
 def main():
     startTime = datetime.now()
@@ -37,6 +39,8 @@ def main():
     # saveTrainedModel(args, model)
 
     showExecutionTime(startTime)
+    #https://github.com/lukemelas/EfficientNet-PyTorch
+
 
 
 if __name__ == '__main__':
