@@ -117,3 +117,5 @@ SourceCode/MnistGithub/SourceCode/MnistGithub/Data/MNIST/raw/train-labels-idx1-u
 .idea/EITI_masterThesis.iml
 .idea/misc.xml
 .idea/workspace.xml
+SourceCode/efficientnet_pytorch/pretrainedModel/efficientnet-b4.pth
+SourceCode/efficientnet_pytorch/pretrainedModel/efficientnet-b0.pth

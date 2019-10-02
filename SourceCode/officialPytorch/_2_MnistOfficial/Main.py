@@ -3,7 +3,7 @@ import torch.optim as optim
 from networkArchitecture import *
 from useImages import *
 from setLoader import setLoader
-from setParserArguments import setParserArguments
+from setParserArguments import setParserArgumentsMnist
 from trainModel import *
 from testModel import *
 from showExecutionTime import *
@@ -15,7 +15,7 @@ def main():
     startTime = datetime.now()
 
     # Training settings
-    args = setParserArguments()
+    args = setParserArgumentsMnist()
 
     useCuda = not args.no_cuda and torch.cuda.is_available()
     torch.manual_seed(args.seed)
