@@ -178,9 +178,10 @@ class EfficientNet(nn.Module):
 
         # Convolution layers
         x = self.extract_features(inputs)
-
+        #print(x.shape)
         # Pooling and final linear layer
         x = F.adaptive_avg_pool2d(x, 1).squeeze(-1).squeeze(-1)
+        #print(x.shape)
         if self._dropout:
             x = F.dropout(x, p=self._dropout, training=self.training)
         x = self._fc(x)
@@ -218,7 +219,7 @@ class EfficientNet(nn.Module):
     def _check_model_name_is_valid(cls, model_name, also_need_pretrained_weights=False):
         """ Validates model name. None that pretrained weights are only available for
         the first four models (efficientnet-b{i} for i in 0,1,2,3) at the moment. """
-        num_models = 4 if also_need_pretrained_weights else 8
+        num_models = 8 if also_need_pretrained_weights else 8
         valid_models = ['efficientnet-b' + str(i) for i in range(num_models)]
         if model_name not in valid_models:
             raise ValueError('model_name should be one of: ' + ', '.join(valid_models))
