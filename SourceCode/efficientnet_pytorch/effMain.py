@@ -1,5 +1,7 @@
 from __future__ import print_function
 import torch
+
+from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
@@ -8,11 +10,20 @@ import json
 import PIL
 from PIL import Image
 from torchvision import transforms
-from torch.nn import functional as F
-from collections import deque
+
+import Augmentor
+
 
 def main():
     startTime = datetime.now()
+
+    p = Augmentor.Pipeline("aug")
+    p.rotate(probability=1, max_left_rotation=25, max_right_rotation=25)
+    p.flip_left_right(probability=0.8)
+    p.sample(100)
+
+    print("augemented")
+    return
 
     # Training settings
     args = setParserArgumentsMnist()
@@ -29,53 +40,48 @@ def main():
 
     modelName = 'efficientnet-b2'
     imageSize = EfficientNet.get_image_size(modelName)
-    print("imgSize "+str(imageSize))
+    print("imgSize " + str(imageSize))
     model = EfficientNet.pretrained(modelName).cuda()
+    model.eval()
 
     # for epoch in range(1, args.epochs + 1):
 
-    # Open image
-    img1 = Image.open('img.jpg')
-    img2 = Image.open('img2.jpg')
-    img3 = Image.open('img_200.jpg')
-    img4 = Image.open('m1.jpg')
-    img5 = Image.open('m2.jpg')
-    img6 = Image.open('m3.jpg')
-
     # Preprocess image
     tfms = transforms.Compose([
-            transforms.Resize(imageSize, interpolation=PIL.Image.BICUBIC),
-            transforms.CenterCrop(imageSize),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+        transforms.Resize(imageSize, interpolation=PIL.Image.BICUBIC),
+        transforms.CenterCrop(imageSize),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
-    img1 = tfms(img1).unsqueeze(0).cuda()
-    img2 = tfms(img2).unsqueeze(0).cuda()
-    img3 = tfms(img3).unsqueeze(0).cuda()
-    img4 = tfms(img4).unsqueeze(0).cuda()
-    img5 = tfms(img5).unsqueeze(0).cuda()
-    img6 = tfms(img6).unsqueeze(0).cuda()
+    # Open image
 
-    view = [Image.open('view_d15.jpg'), Image.open('view_g15.jpg'), Image.open('view_m15.jpg'),
-            Image.open('view_p15.jpg'), Image.open('view_rl15.jpg'), Image.open('view_rp15.jpg')]
-    featreList = []
-    lossList = []
+    nameViews = [
+        'view_d15.jpg',
+        'view_g15.jpg',
+        'view_m15.jpg',
+        'view_p15.jpg',
+        'view_rl15.jpg',
+        'view_rp15.jpg']
 
-    for item in view:
-        item = tfms(item).unsqueeze(0).cuda()
-        feature = model.extract_features(item)
-        featreList.append(feature)
+    compareImages(model, nameViews, tfms)
 
-    for i in range(len(featreList)):
-        for j in range(len(deque(featreList))):
-            if(i>=j):
-                continue
-            lossMse = F.mse_loss(featreList[i], featreList[j], reduction='mean').item()
-            lossList.append(lossMse)
-            print("i:"+str(i)+" j:"+str(j)+" == "+str(lossMse))
+    # ---------------------------------
 
-    print("max: "+str(max(lossList)))
-    print("min: " + str(min(lossList)))
+    nameImg = [
+        'building.jpg',
+        'dresKolano.jpg',
+        'dresTatu.jpg',
+        #'dresidzie.jpg',
+        'pandaSiedzi.jpg',
+        'pandaSiedzi128.jpg',
+        'pandaStoi.jpg',
+        'pandaStoi200.jpg',
+        #'pies.jpg'
+        ]
+
+    compareImages(model, nameImg, tfms)
+
+    # ---------------------------------
 
 
     # Load class names
@@ -83,7 +89,7 @@ def main():
     labels_map = [labels_map[str(i)] for i in range(1000)]
 
     # Classify with EfficientNet
-    model.eval()
+    # model.eval()
     # with torch.no_grad():
     # logits1 = model(img1)
     # logits2 = model(img2)
@@ -95,31 +101,31 @@ def main():
     # preds3 = torch.topk(logits2, k=5).indices.squeeze(0).tolist()
     # preds4 = torch.topk(logits2, k=5).indices.squeeze(0).tolist()
 
-    features1 = model.extract_features(img1)
-    features2 = model.extract_features(img2)
-    features3 = model.extract_features(img3)
-    features4 = model.extract_features(img4)
-    features5 = model.extract_features(img5)
-    features6 = model.extract_features(img6)
-
-    print("\n-mse_loss--sum----")
-    print(features1.shape)
-    loss1 = F.mse_loss(features1, features2, reduction='mean').item()
-    print("panda " + str(loss1))
-    loss2 = F.mse_loss(features1, features3, reduction='mean').item()
-    print("panda " + str(loss2))
-    loss3 = F.mse_loss(features4, features5, reduction='mean').item()
-    print("dres " + str(loss3))
-    loss4 = F.mse_loss(features4, features6, reduction='mean').item()
-    print("dres " + str(loss4))
-    loss5 = F.mse_loss(features1, features4, reduction='mean').item()
-    print("dres-panda " + str(loss5))
-    loss6 = F.mse_loss(features2, features6, reduction='mean').item()
-    print("dres-panda " + str(loss6))
-
-    print("\n------------------\n")
-
-    print('-----')
+    # features1 = model.extract_features(img1)
+    # features2 = model.extract_features(img2)
+    # features3 = model.extract_features(img3)
+    # features4 = model.extract_features(img4)
+    # features5 = model.extract_features(img5)
+    # features6 = model.extract_features(img6)
+    #
+    # print("\n-mse_loss--sum----")
+    # print(features1.shape)
+    # loss1 = F.mse_loss(features1, features2, reduction='mean').item()
+    # print("panda " + str(loss1))
+    # loss2 = F.mse_loss(features1, features3, reduction='mean').item()
+    # print("panda " + str(loss2))
+    # loss3 = F.mse_loss(features4, features5, reduction='mean').item()
+    # print("dres " + str(loss3))
+    # loss4 = F.mse_loss(features4, features6, reduction='mean').item()
+    # print("dres " + str(loss4))
+    # loss5 = F.mse_loss(features1, features4, reduction='mean').item()
+    # print("dres-panda " + str(loss5))
+    # loss6 = F.mse_loss(features2, features6, reduction='mean').item()
+    # print("dres-panda " + str(loss6))
+    #
+    # print("\n------------------\n")
+    #
+    # print('-----')
     # for idx in preds1:
     #     label = labels_map[idx]
     #     prob = torch.softmax(logits1, dim=1)[0, idx].item()
