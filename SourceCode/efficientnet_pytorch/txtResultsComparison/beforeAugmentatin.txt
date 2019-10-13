@@ -1,0 +1,44 @@
+imgSize 260
+Loaded pretrained weights for efficientnet-b2
+---MSE---
+view_d15.jpg : view_g15.jpg == 0.8255141973495483
+view_d15.jpg : view_m15.jpg == 0.47022032737731934
+view_d15.jpg : view_p15.jpg == 0.5375747680664062
+view_d15.jpg : view_rl15.jpg == 0.42961928248405457
+view_d15.jpg : view_rp15.jpg == 0.5818308591842651
+view_g15.jpg : view_m15.jpg == 0.7004297375679016
+view_g15.jpg : view_p15.jpg == 0.5840865969657898
+view_g15.jpg : view_rl15.jpg == 0.8447082042694092
+view_g15.jpg : view_rp15.jpg == 0.43822193145751953
+view_m15.jpg : view_p15.jpg == 0.22497804462909698
+view_m15.jpg : view_rl15.jpg == 0.6373175978660583
+view_m15.jpg : view_rp15.jpg == 0.5206336975097656
+view_p15.jpg : view_rl15.jpg == 0.6306043863296509
+view_p15.jpg : view_rp15.jpg == 0.4707714021205902
+view_rl15.jpg : view_rp15.jpg == 0.4761148989200592
+max: 0.8447082042694092
+min: 0.22497804462909698
+
+building.jpg : dresKolano.jpg == 1.1809263229370117
+building.jpg : dresTatu.jpg == 1.1753835678100586
+building.jpg : pandaSiedzi.jpg == 1.317313313484192
+building.jpg : pandaSiedzi128.jpg == 1.3469915390014648
+building.jpg : pandaStoi.jpg == 1.532501220703125
+building.jpg : pandaStoi200.jpg == 1.5360777378082275
+dresKolano.jpg : dresTatu.jpg == 0.5541973114013672
+dresKolano.jpg : pandaSiedzi.jpg == 1.046234369277954
+dresKolano.jpg : pandaSiedzi128.jpg == 1.0708956718444824
+dresKolano.jpg : pandaStoi.jpg == 1.304468035697937
+dresKolano.jpg : pandaStoi200.jpg == 1.3095371723175049
+dresTatu.jpg : pandaSiedzi.jpg == 1.04280424118042
+dresTatu.jpg : pandaSiedzi128.jpg == 1.0684605836868286
+dresTatu.jpg : pandaStoi.jpg == 1.288704514503479
+dresTatu.jpg : pandaStoi200.jpg == 1.294672966003418
+pandaSiedzi.jpg : pandaSiedzi128.jpg == 0.04057086259126663
+pandaSiedzi.jpg : pandaStoi.jpg == 0.822641134262085
+pandaSiedzi.jpg : pandaStoi200.jpg == 0.8062680959701538
+pandaSiedzi128.jpg : pandaStoi.jpg == 0.904900848865509
+pandaSiedzi128.jpg : pandaStoi200.jpg == 0.8894548416137695
+pandaStoi.jpg : pandaStoi200.jpg == 0.014718489721417427
+max: 1.5360777378082275
+min: 0.014718489721417427
