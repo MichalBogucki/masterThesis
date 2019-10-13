@@ -9,26 +9,13 @@ from modelSourceCode import EfficientNet
 import json
 import PIL
 from PIL import Image
-from torchvision import transforms
-
-import Augmentor
+from torchvision import transforms, datasets
 
 
 def main():
     startTime = datetime.now()
 
-    p = Augmentor.Pipeline("aug")
-
-    p.skew(probability=0.5)
-    p.shear(probability=0.5, max_shear_left=10, max_shear_right=10)
-    p.random_distortion(probability=0.5, grid_width=8, grid_height=8, magnitude=2)
-    p.rotate(probability=0.5, max_left_rotation=15, max_right_rotation=15)
-    p.flip_left_right(probability=0.5)
-    p.zoom_random(probability=0.5, percentage_area=0.8)
-    p.sample(10000)
-
-    print("augemented")
-    return
+    #performAugmentation()
 
     # Training settings
     args = setParserArgumentsMnist()
@@ -41,9 +28,10 @@ def main():
     # trainLoader = setLoader(kwargs, shouldTrain=True, shouldDownload=False, batchSize=args.batch_size)
     # testLoader = setLoader(kwargs, shouldTrain=False, shouldDownload=False, batchSize=args.test_batch_size)
 
-    # model = NetworkArchitecture().to(device)
 
-    modelName = 'efficientnet-b2'
+
+
+    modelName = 'efficientnet-b5'
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
     model = EfficientNet.pretrained(modelName).cuda()
@@ -58,8 +46,17 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
+    # trainDataset = datasets.ImageFolder(root='jpgImages/aug/train',
+    #                                     transform=tfms)
+    # testDataset = datasets.ImageFolder(root='jpgImages/aug/test',
+    #                                    transform=tfms)
+    # trainLoader = torch.utils.data.DataLoader(trainDataset,
+    #                                           batch_size=4, shuffle=True,
+    #                                           num_workers=4)
+    # testLoader = torch.utils.data.DataLoader(testDataset,
+    #                                          batch_size=4, shuffle=True,
+    #                                          num_workers=4)
     # Open image
-
     nameViews = [
         'view_d15.jpg',
         'view_g15.jpg',
@@ -76,12 +73,12 @@ def main():
         'building.jpg',
         'dresKolano.jpg',
         'dresTatu.jpg',
-        #'dresidzie.jpg',
+        'dresidzie.jpg',
         'pandaSiedzi.jpg',
         'pandaSiedzi128.jpg',
         'pandaStoi.jpg',
         'pandaStoi200.jpg',
-        #'pies.jpg'
+        'pies.jpg'
         ]
 
     compareImages(model, nameImg, tfms)
