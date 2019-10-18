@@ -9,7 +9,9 @@ from modelSourceCode import EfficientNet
 import json
 import PIL
 from PIL import Image
-from torchvision import transforms, datasets
+from torchvision import transforms
+
+from visualizeGraphWithOnnxToNetron import visualizeGraphWithOnnxToNetron
 
 
 def main():
@@ -25,20 +27,14 @@ def main():
     device = torch.device("cuda" if useCuda else "cpu")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    # trainLoader = setLoader(kwargs, shouldTrain=True, shouldDownload=False, batchSize=64)
-    # testLoader = setLoader(kwargs, shouldTrain=False, shouldDownload=False, batchSize=args.test_batch_size)
 
+    modelName = 'efficientnet-b7'
 
-
-
-    modelName = 'efficientnet-b3'
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
     #model = EfficientNet.pretrained(modelName)
     model = EfficientNet.pretrained(modelName).cuda()
     model.eval()
-
-
 
 
 
@@ -71,10 +67,9 @@ def main():
         'view_rl15.jpg',
         'view_rp15.jpg']
 
-    dummy_input = Image.open("jpgImages/view_d15.jpg")
-    item = tfms(dummy_input).unsqueeze(0).cuda()
-    torch.onnx.export(model, item, "test-b1.onnx", verbose=True)
-    return
+
+    #return visualizeGraphWithOnnxToNetron(model)
+
     compareImages(model, nameViews, tfms)
 
     # ---------------------------------
