@@ -25,18 +25,24 @@ def main():
     device = torch.device("cuda" if useCuda else "cpu")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    # trainLoader = setLoader(kwargs, shouldTrain=True, shouldDownload=False, batchSize=args.batch_size)
+    # trainLoader = setLoader(kwargs, shouldTrain=True, shouldDownload=False, batchSize=64)
     # testLoader = setLoader(kwargs, shouldTrain=False, shouldDownload=False, batchSize=args.test_batch_size)
 
 
 
 
-    modelName = 'efficientnet-b5'
+    modelName = 'efficientnet-b3'
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
+    #model = EfficientNet.pretrained(modelName)
     model = EfficientNet.pretrained(modelName).cuda()
     model.eval()
 
+
+
+
+
+    # ----------
     # for epoch in range(1, args.epochs + 1):
 
     # Preprocess image
@@ -65,6 +71,10 @@ def main():
         'view_rl15.jpg',
         'view_rp15.jpg']
 
+    dummy_input = Image.open("jpgImages/view_d15.jpg")
+    item = tfms(dummy_input).unsqueeze(0).cuda()
+    torch.onnx.export(model, item, "test-b1.onnx", verbose=True)
+    return
     compareImages(model, nameViews, tfms)
 
     # ---------------------------------
