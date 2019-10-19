@@ -1,5 +1,6 @@
 from __future__ import print_function
 import torch
+from torch import nn
 
 from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
@@ -10,6 +11,7 @@ import json
 import PIL
 from PIL import Image
 from torchvision import transforms
+
 
 from visualizeGraphWithOnnxToNetron import visualizeGraphWithOnnxToNetron
 
@@ -28,14 +30,26 @@ def main():
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
 
-    modelName = 'efficientnet-b7'
+    modelName = 'efficientnet-b0'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
     #model = EfficientNet.pretrained(modelName)
     model = EfficientNet.pretrained(modelName).cuda()
     model.eval()
+    print("Original")
+    print(model)
 
+    model2 = ModelLastBinaryLayer(model)
+    print("ModelLastBinaryLayer")
+    print(model2)
+
+    model3 = FineTuneModel(model,model._fc.in_features, 2)
+    print("FineTuneModel")
+    print(model3)
+    return
+    print("dupa")
+    print(model._fc.in_features)
 
 
     # ----------
@@ -157,6 +171,37 @@ def main():
     #     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
 
     showExecutionTime(startTime)
+
+class ModelLastBinaryLayer(nn.Module):
+    def __init__(self, pretrained_model):
+        super(ModelLastBinaryLayer, self).__init__()
+        self.pretrained_model = pretrained_model
+        self.last_layer = nn.Linear(1000, 2)
+
+    def forward(self, x):
+        return self.last_layer(self.pretrained_model(x))
+
+
+class FineTuneModel(nn.Module):
+    def __init__(self, original_model, inFeatuers, num_classes):
+        super(FineTuneModel, self).__init__()
+        # Everything except the last linear layer
+        self.features = nn.Sequential(*list(original_model.children())[:-1])
+        self.classifier = nn.Sequential(
+            nn.Linear(inFeatuers, num_classes)
+        )
+        self.modelName = 'LightCNN-29'
+        # Freeze those weights
+        for p in self.features.parameters():
+            p.requires_grad = False
+
+
+    def forward(self, x):
+        f = self.features(x)
+        f = f.view(f.size(0), -1)
+        y = self.classifier(f)
+        return y
+
 
 
 if __name__ == '__main__':

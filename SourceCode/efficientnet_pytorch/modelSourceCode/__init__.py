@@ -5,6 +5,6 @@ from .utils import (
     BlockArgs,
     BlockDecoder,
     efficientnet,
-    get_model_params,
+    get_model_params
 )
 

@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from .utils import (
+from .utils_EfficientSwish import (
     round_filters,
     round_repeats,
     drop_connect,
@@ -12,7 +12,7 @@ from .utils import (
     load_pretrained_weights,
     Swish,
     MemoryEfficientSwish,
-    load_pretrained_weights_Disk
+    load_pretrained_weights_Disk,
 )
 
 
@@ -100,7 +100,7 @@ class MBConvBlock(nn.Module):
         self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
 
 
-class EfficientNet(nn.Module):
+class EfficientNet_swish(nn.Module):
     """
     An EfficientNet model. Most easily loaded with the .from_name or .from_pretrained methods
 
@@ -193,12 +193,16 @@ class EfficientNet(nn.Module):
         bs = inputs.size(0)
         # Convolution layers
         x = self.extract_features(inputs)
+        print(x.shape)
 
         # Pooling and final linear layer
         x = self._avg_pooling(x)
         x = x.view(bs, -1)
         x = self._dropout(x)
         x = self._fc(x)
+        print(x.shape)
+        x = nn.Linear(x, 2)
+        print(x.shape)
         return x
 
     @classmethod
@@ -245,8 +249,3 @@ class EfficientNet(nn.Module):
         valid_models = ['efficientnet-b' + str(i) for i in range(num_models)]
         if model_name not in valid_models:
             raise ValueError('model_name should be one of: ' + ', '.join(valid_models))
-
-
-
-
-
