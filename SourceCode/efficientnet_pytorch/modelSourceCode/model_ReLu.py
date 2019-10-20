@@ -2,7 +2,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from .utils_EfficientSwish import (
+from .utils import (
+    relu_fn,
     round_filters,
     round_repeats,
     drop_connect,
@@ -10,8 +11,6 @@ from .utils_EfficientSwish import (
     get_model_params,
     efficientnet_params,
     load_pretrained_weights,
-    Swish,
-    MemoryEfficientSwish,
     load_pretrained_weights_Disk,
 )
 
@@ -64,7 +63,6 @@ class MBConvBlock(nn.Module):
         final_oup = self._block_args.output_filters
         self._project_conv = Conv2d(in_channels=oup, out_channels=final_oup, kernel_size=1, bias=False)
         self._bn2 = nn.BatchNorm2d(num_features=final_oup, momentum=self._bn_mom, eps=self._bn_eps)
-        self._swish = MemoryEfficientSwish()
 
     def forward(self, inputs, drop_connect_rate=None):
         """
@@ -76,13 +74,13 @@ class MBConvBlock(nn.Module):
         # Expansion and Depthwise Convolution
         x = inputs
         if self._block_args.expand_ratio != 1:
-            x = self._swish(self._bn0(self._expand_conv(inputs)))
-        x = self._swish(self._bn1(self._depthwise_conv(x)))
+            x = relu_fn(self._bn0(self._expand_conv(inputs)))
+        x = relu_fn(self._bn1(self._depthwise_conv(x)))
 
         # Squeeze and Excitation
         if self.has_se:
             x_squeezed = F.adaptive_avg_pool2d(x, 1)
-            x_squeezed = self._se_expand(self._swish(self._se_reduce(x_squeezed)))
+            x_squeezed = self._se_expand(relu_fn(self._se_reduce(x_squeezed)))
             x = torch.sigmoid(x_squeezed) * x
 
         x = self._bn2(self._project_conv(x))
@@ -95,12 +93,8 @@ class MBConvBlock(nn.Module):
             x = x + inputs  # skip connection
         return x
 
-    def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export)"""
-        self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
 
-
-class EfficientNet_swish(nn.Module):
+class EfficientNet(nn.Module):
     """
     An EfficientNet model. Most easily loaded with the .from_name or .from_pretrained methods
 
@@ -158,23 +152,14 @@ class EfficientNet_swish(nn.Module):
         self._bn1 = nn.BatchNorm2d(num_features=out_channels, momentum=bn_mom, eps=bn_eps)
 
         # Final linear layer
-        self._avg_pooling = nn.AdaptiveAvgPool2d(1)
-        self._dropout = nn.Dropout(self._global_params.dropout_rate)
+        self._dropout = self._global_params.dropout_rate
         self._fc = nn.Linear(out_channels, self._global_params.num_classes)
-        self._swish = MemoryEfficientSwish()
-
-    def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export)"""
-        self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
-        for block in self._blocks:
-            block.set_swish(memory_efficient)
-
 
     def extract_features(self, inputs):
         """ Returns output of the final convolution layer """
 
         # Stem
-        x = self._swish(self._bn0(self._conv_stem(inputs)))
+        x = relu_fn(self._bn0(self._conv_stem(inputs)))
 
         # Blocks
         for idx, block in enumerate(self._blocks):
@@ -184,25 +169,23 @@ class EfficientNet_swish(nn.Module):
             x = block(x, drop_connect_rate=drop_connect_rate)
 
         # Head
-        x = self._swish(self._bn1(self._conv_head(x)))
+        x = relu_fn(self._bn1(self._conv_head(x)))
 
         return x
 
     def forward(self, inputs):
         """ Calls extract_features to extract features, applies final linear layer, and returns logits. """
-        bs = inputs.size(0)
+
         # Convolution layers
         x = self.extract_features(inputs)
-        print(x.shape)
-
+        #print(x.shape)
         # Pooling and final linear layer
-        x = self._avg_pooling(x)
-        x = x.view(bs, -1)
-        x = self._dropout(x)
+        x = F.adaptive_avg_pool2d(x, 1).squeeze(-1).squeeze(-1)
+        #print(x.shape)
+        if self._dropout:
+            x = F.dropout(x, p=self._dropout, training=self.training)
         x = self._fc(x)
-        print(x.shape)
-        x = nn.Linear(x, 2)
-        print(x.shape)
+        #print(x.shape)
         return x
 
     @classmethod
@@ -212,23 +195,15 @@ class EfficientNet_swish(nn.Module):
         return cls(blocks_args, global_params)
 
     @classmethod
-    def from_pretrained(cls, model_name, num_classes=1000, in_channels = 3):
+    def from_pretrained(cls, model_name, num_classes=1000):
         model = cls.from_name(model_name, override_params={'num_classes': num_classes})
         load_pretrained_weights(model, model_name, load_fc=(num_classes == 1000))
-        if in_channels != 3:
-            Conv2d = get_same_padding_conv2d(image_size = model._global_params.image_size)
-            out_channels = round_filters(32, model._global_params)
-            model._conv_stem = Conv2d(in_channels, out_channels, kernel_size=3, stride=2, bias=False)
         return model
 
     @classmethod
-    def pretrained(cls, model_name, num_classes=1000, in_channels = 3):
+    def pretrained(cls, model_name, num_classes=1000):
         model = cls.from_name(model_name, override_params={'num_classes': num_classes})
         load_pretrained_weights_Disk(model, model_name, load_fc=(num_classes == 1000))
-        if in_channels != 3:
-            Conv2d = get_same_padding_conv2d(image_size = model._global_params.image_size)
-            out_channels = round_filters(32, model._global_params)
-            model._conv_stem = Conv2d(in_channels, out_channels, kernel_size=3, stride=2, bias=False)
         return model
 
     @classmethod

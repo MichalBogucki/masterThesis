@@ -3,7 +3,7 @@ import torch
 from torch.nn import functional as F
 
 from ManualFineTuneModel import ManualFineTuneModel
-#from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
+from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
@@ -29,7 +29,7 @@ def main():
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
 
-    modelName = 'efficientnet-b0'
+    modelName = 'efficientnet-b7'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
@@ -37,6 +37,8 @@ def main():
     model = EfficientNet.pretrained(modelName, num_classes=2).cuda()
     model.eval()
 
+    #model2 = ModelBinaryLayerAfterFC(model)
+    #model3 = ManualFineTuneModel(model, model._fc.in_features, 2)
 
 
     # ----------
@@ -57,7 +59,7 @@ def main():
     #                                           batch_size=4, shuffle=True,
     #                                           num_workers=4)
     testLoader = torch.utils.data.DataLoader(testDataset,
-                                             batch_size=8, shuffle=False,
+                                             batch_size=4, shuffle=False,
                                              num_workers=4, pin_memory=True)
 
     # #----
@@ -115,67 +117,28 @@ def main():
 
     # ---------------------------------
 
-    # ---Binary---
+
+    #---Binary---
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
-    # Classify with EfficientNet
-    with torch.no_grad():
-        for data, target in testLoader:
-            print("DUPA")
-            print(target)
-            data, target = data.to(device), target.to(device)
-            logits1 = model(data)
-            for item in logits1:
-                # print(item.shape)
-                # print(item)
-                preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
-                # print(preds1)
-                print('-----')
-                for idx in preds1:
-                    # print(idx)
-                    label = labels_map[idx]
-                    prob = torch.softmax(item, dim=0)[idx].item()
-                    print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-    # ---Binary---
-
-    #---labels_map---
-    labels_map = json.load(open('labels_map.txt'))
-    labels_map = [labels_map[str(i)] for i in range(1000)]
-    img1 = Image.open('jpgImages/pandaSiedzi.jpg')
-    img1 = tfms(img1).unsqueeze(0).cuda()
     #Classify with EfficientNet
     model.eval()
     with torch.no_grad():
-        logits1 = model(img1)
-        print(logits1.shape)
-        preds1 = torch.topk(logits1, k=2).indices.squeeze(0).tolist()
-        print(logits1)
-        print(preds1)
-        print('-----')
-        for idx in preds1:
-            print(idx)
-            label = labels_map[idx]
-            prob = torch.softmax(logits1, dim=1)[0, idx].item()
-            print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-    # ---labels_map---
-
-    # print('-----2')
-    # for idx in preds2:
-    #     label = labels_map[idx]
-    #     prob = torch.softmax(logits2, dim=1)[0, idx].item()
-    #     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-    #
-    # print('-----3')
-    # for idx in preds3:
-    #     label = labels_map[idx]
-    #     prob = torch.softmax(logits3, dim=1)[0, idx].item()
-    #     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-    #
-    # print('-----4')
-    # for idx in preds4:
-    #     label = labels_map[idx]
-    #     prob = torch.softmax(logits4, dim=1)[0, idx].item()
-    #     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+        for data, target in testLoader:
+                data, target = data.to(device), target.to(device)
+                logits1 = model(data)
+                for item in logits1:
+                    #print(item.shape)
+                    #print(item)
+                    preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                    #print(preds1)
+                    print('-----')
+                    for idx in preds1:
+                        #print(idx)
+                        label = labels_map[idx]
+                        prob = torch.softmax(item, dim=0)[idx].item()
+                        print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+    return
 
     showExecutionTime(startTime)
 
