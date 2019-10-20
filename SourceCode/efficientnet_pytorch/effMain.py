@@ -3,19 +3,16 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
-from performAugmentation import *
 
 import json
 import PIL
 from PIL import Image
 from torchvision import transforms, datasets
-
-
-from visualizeGraphWithOnnxToNetron import visualizeGraphWithOnnxToNetron
 
 
 def main():
@@ -41,18 +38,18 @@ def main():
     model.eval()
     print("Original")
     print(model)
-
-    model2 = ModelLastBinaryLayer(model)
-    print("ModelLastBinaryLayer")
+    return
+    model2 = ModelBinaryLayerAfterFC(model)
+    print("ModelBinaryLayerAfterFC")
     print(model2)
-
+    #
     model3 = FineTuneModel(model,model._fc.in_features, 2)
     print("FineTuneModel")
     print(model3)
     return
-    print("dupa")
-    print(model._fc.in_features)
-    return
+    # print("dupa")
+    # print(model._fc.in_features)
+    # return
 
 
     # ----------
@@ -73,8 +70,8 @@ def main():
     #                                           batch_size=4, shuffle=True,
     #                                           num_workers=4)
     testLoader = torch.utils.data.DataLoader(testDataset,
-                                             batch_size=3, shuffle=False,
-                                             num_workers=1)
+                                             batch_size=8, shuffle=False,
+                                             num_workers=4, pin_memory=True)
 
     #----
     model.eval()
@@ -199,15 +196,6 @@ def main():
 
     showExecutionTime(startTime)
 
-class ModelLastBinaryLayer(nn.Module):
-    def __init__(self, pretrained_model):
-        super(ModelLastBinaryLayer, self).__init__()
-        self.pretrained_model = pretrained_model
-        self.last_layer = nn.Linear(1000, 2)
-
-    def forward(self, x):
-        return self.last_layer(self.pretrained_model(x))
-
 
 class FineTuneModel(nn.Module):
     def __init__(self, original_model, inFeatuers, num_classes):
@@ -217,7 +205,7 @@ class FineTuneModel(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(inFeatuers, num_classes)
         )
-        self.modelName = 'LightCNN-29'
+
         # Freeze those weights
         for p in self.features.parameters():
             p.requires_grad = False
