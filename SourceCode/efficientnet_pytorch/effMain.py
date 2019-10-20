@@ -1,16 +1,18 @@
 from __future__ import print_function
 import torch
 from torch import nn
+from torch.nn import functional as F
 
 from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
+from performAugmentation import *
 
 import json
 import PIL
 from PIL import Image
-from torchvision import transforms
+from torchvision import transforms, datasets
 
 
 from visualizeGraphWithOnnxToNetron import visualizeGraphWithOnnxToNetron
@@ -50,6 +52,7 @@ def main():
     return
     print("dupa")
     print(model._fc.in_features)
+    return
 
 
     # ----------
@@ -64,14 +67,38 @@ def main():
 
     # trainDataset = datasets.ImageFolder(root='jpgImages/aug/train',
     #                                     transform=tfms)
-    # testDataset = datasets.ImageFolder(root='jpgImages/aug/test',
-    #                                    transform=tfms)
+    testDataset = datasets.ImageFolder(root='jpgImages/aug/test',
+                                       transform=tfms)
     # trainLoader = torch.utils.data.DataLoader(trainDataset,
     #                                           batch_size=4, shuffle=True,
     #                                           num_workers=4)
-    # testLoader = torch.utils.data.DataLoader(testDataset,
-    #                                          batch_size=4, shuffle=True,
-    #                                          num_workers=4)
+    testLoader = torch.utils.data.DataLoader(testDataset,
+                                             batch_size=3, shuffle=False,
+                                             num_workers=1)
+
+    #----
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in testLoader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            # print("output")
+            # print(output)
+            # print("target")
+            # print(target)
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
+            # print('Test set [x/y]: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'
+            #     .format(test_loss, correct, len(testLoader.dataset), 100. * correct / len(testLoader.dataset)))
+
+    test_loss /= len(testLoader.dataset)
+
+    print('Test set [x/y]: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'
+          .format(test_loss, correct, len(testLoader.dataset), 100. * correct / len(testLoader.dataset)))
+    #----
     # Open image
     nameViews = [
         'view_d15.jpg',

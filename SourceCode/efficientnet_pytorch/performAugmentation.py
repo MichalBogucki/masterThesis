@@ -2,8 +2,7 @@ import Augmentor
 
 
 def performAugmentation():
-    return
-    augImageDirectory = "jpgImages/aug"
+    augImageDirectory = "jpgImages/aug/test"
     p = Augmentor.Pipeline(augImageDirectory)
     p.skew(probability=0.5)
     p.shear(probability=0.5, max_shear_left=10, max_shear_right=10)
@@ -11,6 +10,6 @@ def performAugmentation():
     p.rotate(probability=0.5, max_left_rotation=15, max_right_rotation=15)
     p.flip_left_right(probability=0.5)
     p.zoom_random(probability=0.5, percentage_area=0.8)
-    p.sample(10000)
+    p.sample(100)
     print("augemented")
     return
