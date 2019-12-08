@@ -245,4 +245,5 @@ class EfficientNet(nn.Module):
         num_models = 8 if also_need_pretrained_weights else 8
         valid_models = ['efficientnet-b' + str(i) for i in range(num_models)]
         if model_name not in valid_models:
-            raise ValueError('model_name should be one of: ' + ', '.join(valid_models))
+            #raise ValueError('model_name should be one of: ' + ', '.join(valid_models))
+            print('\nmodel_name should be one of: ' + ', '.join(valid_models))

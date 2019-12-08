@@ -34,6 +34,7 @@ def main():
 
 
     modelName = 'efficientnet-b0'
+    #modelName ='efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
@@ -103,7 +104,8 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    #validateBinaryTatoo(dataloader, device, model)
+    validateBinaryTatoo(dataloader, device, model)
+    #return
     # ---Binary---
 
 
@@ -121,14 +123,14 @@ def main():
     # Number of classes in the dataset
     num_classes = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 8
+    batch_size = 30
     # Number of epochs to train for
-    num_epochs = 5
+    num_epochs = 3
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
     feature_extract = True
-
+    #set_parameter_requires_grad(model, feature_extract)
     # Create the Optimizer
     params_to_update = model.parameters()
     print("Params to learn:")
@@ -137,11 +139,11 @@ def main():
         for name, param in model.named_parameters():
             if param.requires_grad == True:
                 params_to_update.append(param)
-                print("\t", name)
-    else:
-        for name, param in model.named_parameters():
-            if param.requires_grad == True:
-                print("\t", name)
+                # print("\t", name)
+    # else:
+    #     for name, param in model.named_parameters():
+    #         if param.requires_grad == True:
+    #             print("\t", name)
 
     # Observe that all parameters are being optimized
     optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
@@ -160,8 +162,8 @@ def main():
     model_ft, hist = train_model(model, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs)
     #+++++ Train Time ++++++++
 
-    compareImages(model, nameViews, tfms)
-    compareImages(model_ft, nameImg, tfms)
+    #compareImages(model, nameViews, tfms)
+    #compareImages(model_ft, nameImg, tfms)
     # ---------------------------------
 
     # ---Binary---
@@ -170,10 +172,10 @@ def main():
 
 
     #---labels_map---
-    validateLabelsMap(model_ft, tfms)
+    #validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    #saveTrainedModel(model, modelName)
+    saveTrainedModel(model, modelName)
 
     showExecutionTime(startTime)
 
@@ -192,11 +194,11 @@ def validateBinaryTatoo(dataloader, device, model):
                 print(paths[index])
                 index += 1
                 preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
-                print('-----')
                 for idx in preds1:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
                     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                print('-----')
 
 
 def validateLabelsMap(model, tfms):
