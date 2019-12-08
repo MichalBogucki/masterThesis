@@ -7,7 +7,7 @@ import torch.nn as nn
 import os
 
 from ImageFolderWithPaths import ImageFolderWithPaths
-#from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
+# from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
@@ -22,7 +22,7 @@ from torchvision import transforms, datasets
 def main():
     startTime = datetime.now()
 
-    #performAugmentation()
+    # performAugmentation()
 
     # Training settings
     args = setParserArgumentsMnist()
@@ -32,17 +32,22 @@ def main():
     device = torch.device("cuda")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-
-    modelName = 'efficientnet-b0'
-    #modelName ='efficientnet-b4tuned'
+    # modelName = 'efficientnet-b4'
+    modelName = 'efficientnet-b0tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
 
-    model = EfficientNet.pretrained(modelName, num_classes=2).cuda()
+    # Number of classes in the dataset
+    num_PreLoad_Classes = 2
+    num_tunedClasses = 2
+    # Batch size for training (change depending on how much memory you have)
+    batch_size = 30
+    # Number of epochs to train for
+    num_epochs = 4
+
+    model = EfficientNet.pretrained(modelName, num_classes=num_PreLoad_Classes, tuned_classes=num_tunedClasses).cuda()
     model.eval()
-
-
 
     # ----------
     # for epoch in range(1, args.epochs + 1):
@@ -69,10 +74,10 @@ def main():
     # instantiate the dataset and dataloader
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=8, shuffle=True,
-                                            num_workers=4, pin_memory=True)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
+                                             num_workers=4, pin_memory=True)
 
-    #----
+    # ----
     # Open image
     nameViews = [
         'view_d15.jpg',
@@ -82,10 +87,9 @@ def main():
         'view_rl15.jpg',
         'view_rp15.jpg']
 
+    # return visualizeGraphWithOnnxToNetron(model)
 
-    #return visualizeGraphWithOnnxToNetron(model)
-
-    #compareImages(model, nameViews, tfms)
+    # compareImages(model, nameViews, tfms)
     # ---------------------------------
 
     nameImg = [
@@ -98,39 +102,33 @@ def main():
         'pandaStoi.jpg',
         'pandaStoi200.jpg',
         'pies.jpg'
-        ]
+    ]
 
-    #compareImages(model, nameImg, tfms)
+    # compareImages(model, nameImg, tfms)
     # ---------------------------------
 
     # ---Binary---
     validateBinaryTatoo(dataloader, device, model)
-    #return
+    if ('tuned' in modelName):
+        return
     # ---Binary---
 
-
-    #---labels_map---
-    #validateLabelsMap(model, tfms)
+    # ---labels_map---
+    # validateLabelsMap(model, tfms)
     # ---labels_map---
 
-    #+++++ Train Time ++++++++
+    # +++++ Train Time ++++++++
     # Gather the parameters to be optimized/updated in this run. If we are
     #  finetuning we will be updating all parameters. However, if we are
     #  doing feature extract method, we will only update the parameters
     #  that we have just initialized, i.e. the parameters with requires_grad
     #  is True.
 
-    # Number of classes in the dataset
-    num_classes = 2
-    # Batch size for training (change depending on how much memory you have)
-    batch_size = 30
-    # Number of epochs to train for
-    num_epochs = 3
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
     feature_extract = True
-    #set_parameter_requires_grad(model, feature_extract)
+    # set_parameter_requires_grad(model, feature_extract)
     # Create the Optimizer
     params_to_update = model.parameters()
     print("Params to learn:")
@@ -160,19 +158,18 @@ def main():
 
     # Train and evaluate
     model_ft, hist = train_model(model, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs)
-    #+++++ Train Time ++++++++
+    # +++++ Train Time ++++++++
 
-    #compareImages(model, nameViews, tfms)
-    #compareImages(model_ft, nameImg, tfms)
+    # compareImages(model, nameViews, tfms)
+    # compareImages(model_ft, nameImg, tfms)
     # ---------------------------------
 
     # ---Binary---
     validateBinaryTatoo(dataloader, device, model_ft)
     # ---Binary---
 
-
-    #---labels_map---
-    #validateLabelsMap(model_ft, tfms)
+    # ---labels_map---
+    # validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
     saveTrainedModel(model, modelName)
@@ -235,7 +232,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25)
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_loss = 0.0
             running_corrects = 0
@@ -299,7 +296,8 @@ def set_parameter_requires_grad(model, feature_extracting):
 
 
 def saveTrainedModel(model, name):
-    torch.save(model.state_dict(), "savedModel/"+name+"tuned.pth")
+    torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000.pth")
+
 
 if __name__ == '__main__':
     main()
