@@ -23,7 +23,7 @@ from torchvision import transforms, datasets
 def main():
     startTime = datetime.now()
 
-    # performAugmentation()
+    #performAugmentation()
 
     # Training settings
     args = setParserArgumentsMnist()
@@ -33,7 +33,7 @@ def main():
     device = torch.device("cuda")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    modelName = 'efficientnet-b0'
+    modelName = 'efficientnet-b0tuned'
     #modelName = 'efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
@@ -43,7 +43,7 @@ def main():
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 6
+    batch_size = 15
     # Number of epochs to train for
     num_epochs = 4
 
@@ -75,7 +75,7 @@ def main():
     # instantiate the dataset and dataloader
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
                                              num_workers=4, pin_memory=True)
 
     # ----
@@ -109,7 +109,7 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    validateBinaryTatoo(dataloader, device, model)
+    validateBinaryTatoo(dataloader, device, model)  #Todo UNCOMMENT ME
     if ('tuned' in modelName):
         return
     # ---Binary---
@@ -166,14 +166,14 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    validateBinaryTatoo(dataloader, device, model_ft)
+    validateBinaryTatoo(dataloader, device, model_ft)  #Todo UNCOMMENT ME
     # ---Binary---
 
     # ---labels_map---
-    # validateLabelsMap(model_ft, tfms)
+    #validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    saveTrainedModel(model, modelName)
+    saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
 
@@ -181,6 +181,7 @@ def main():
 def validateBinaryTatoo(dataloader, device, model):
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
+    print(labels_map) #Todo DELETE ME
     # Classify with EfficientNet
     with torch.no_grad():
         for data, target, paths in dataloader:
@@ -192,6 +193,7 @@ def validateBinaryTatoo(dataloader, device, model):
                 print(paths[index])
                 index += 1
                 preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                print(preds1)  # Todo DELETE ME
                 for idx in preds1:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
