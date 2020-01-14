@@ -23,7 +23,8 @@ from torchvision import transforms, datasets
 def main():
     startTime = datetime.now()
 
-    #performAugmentation()
+    # performAugmentation()
+
 
     # Training settings
     args = setParserArgumentsMnist()
@@ -33,7 +34,7 @@ def main():
     device = torch.device("cuda")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    modelName = 'efficientnet-b0tuned'
+    modelName = 'efficientnet-b4'
     #modelName = 'efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
@@ -43,7 +44,7 @@ def main():
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 15
+    batch_size = 8
     # Number of epochs to train for
     num_epochs = 4
 
