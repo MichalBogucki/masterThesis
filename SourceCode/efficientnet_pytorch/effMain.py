@@ -12,6 +12,7 @@ from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
+from performAugmentation import performAugmentation
 
 import json
 import PIL
@@ -32,8 +33,8 @@ def main():
     device = torch.device("cuda")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    # modelName = 'efficientnet-b4'
-    modelName = 'efficientnet-b0tuned'
+    modelName = 'efficientnet-b0'
+    #modelName = 'efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
@@ -42,7 +43,7 @@ def main():
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 30
+    batch_size = 6
     # Number of epochs to train for
     num_epochs = 4
 
@@ -74,7 +75,7 @@ def main():
     # instantiate the dataset and dataloader
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
                                              num_workers=4, pin_memory=True)
 
     # ----
