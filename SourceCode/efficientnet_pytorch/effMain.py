@@ -6,6 +6,34 @@ import torch.optim as optim
 import torch.nn as nn
 import os
 
+from matplotlib import pyplot as plt
+#
+# import gluoncv
+# from gluoncv import model_zoo, data, utils
+#
+# ##---------------Gluon CV----------------
+# net = model_zoo.get_model('center_net_resnet18_v1b_voc', pretrained=True)
+# # im_fname = utils.download('https://raw.githubusercontent.com/zhreshold/' +
+# #                           'mxnet-ssd/master/data/demo/dog.jpg',
+# #                           path='dog.jpg')
+# im_fname = utils.download('https://qph.fs.quoracdn.net/main-qimg-da7e37dfb53849a470eb440da2e8c7d5',
+#                           path='main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg')
+# #DiskLocation - C:\Users\Michał\.mxnet\models
+#
+#
+# x, img = data.transforms.presets.center_net.load_test(im_fname, short=512)
+# print('Shape of pre-processed image:', x.shape)
+# class_IDs, scores, bounding_boxs = net(x)
+# print(class_IDs)
+# print(scores[0])
+# print(bounding_boxs[0])
+#
+# ax = utils.viz.plot_bbox(img, bounding_boxs[0], scores[0],
+#                          class_IDs[0], class_names=net.classes)
+# plt.show()
+# ##---------------Gluon CV----------------
+
+
 from ImageFolderWithPaths import ImageFolderWithPaths
 # from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from compareImages import compareImages
@@ -25,7 +53,6 @@ def main():
 
     # performAugmentation()
 
-
     # Training settings
     args = setParserArgumentsMnist()
 
@@ -34,7 +61,7 @@ def main():
     device = torch.device("cuda")
     kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
-    modelName = 'efficientnet-b4'
+    modelName = 'efficientnet-b0tuned'
     #modelName = 'efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
@@ -174,7 +201,7 @@ def main():
     #validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
+    #saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
 
@@ -184,14 +211,18 @@ def validateBinaryTatoo(dataloader, device, model):
     labels_map = [labels_map[str(i)] for i in range(2)]
     print(labels_map) #Todo DELETE ME
     # Classify with EfficientNet
+    maxName = ''
+    maxVal = 0
     with torch.no_grad():
         for data, target, paths in dataloader:
             data, target = data.to(device), target.to(device)
             print(target)
             logits1 = model(data)
             index = 0
+            print('----- BATCH -----')
             for item in logits1:
-                print(paths[index])
+                actFileName = paths[index]
+                print(actFileName)
                 index += 1
                 preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
                 print(preds1)  # Todo DELETE ME
@@ -199,7 +230,17 @@ def validateBinaryTatoo(dataloader, device, model):
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
                     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                    maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob)
                 print('-----')
+            print('maxName: {}'.format(maxName))
+            print('maxVal: {}'.format(maxVal))
+
+
+def checkMax(maxName, maxVal, inputName, inputVal):
+    if maxVal < inputVal:
+        maxVal = inputVal
+        maxName = inputName
+    return (maxName, maxVal)
 
 
 def validateLabelsMap(model, tfms):
