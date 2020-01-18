@@ -5,35 +5,7 @@ import copy
 import torch.optim as optim
 import torch.nn as nn
 import os
-
 from matplotlib import pyplot as plt
-#
-# import gluoncv
-# from gluoncv import model_zoo, data, utils
-#
-# ##---------------Gluon CV----------------
-# net = model_zoo.get_model('center_net_resnet18_v1b_voc', pretrained=True)
-# # im_fname = utils.download('https://raw.githubusercontent.com/zhreshold/' +
-# #                           'mxnet-ssd/master/data/demo/dog.jpg',
-# #                           path='dog.jpg')
-# im_fname = utils.download('https://qph.fs.quoracdn.net/main-qimg-da7e37dfb53849a470eb440da2e8c7d5',
-#                           path='main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg')
-# #DiskLocation - C:\Users\Michał\.mxnet\models
-#
-#
-# x, img = data.transforms.presets.center_net.load_test(im_fname, short=512)
-# print('Shape of pre-processed image:', x.shape)
-# class_IDs, scores, bounding_boxs = net(x)
-# print(class_IDs)
-# print(scores[0])
-# print(bounding_boxs[0])
-#
-# ax = utils.viz.plot_bbox(img, bounding_boxs[0], scores[0],
-#                          class_IDs[0], class_names=net.classes)
-# plt.show()
-# ##---------------Gluon CV----------------
-
-
 from ImageFolderWithPaths import ImageFolderWithPaths
 # from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from compareImages import compareImages
@@ -49,6 +21,55 @@ from torchvision import transforms, datasets
 
 
 def main():
+
+
+    # ##---------------Gluon CV----------------
+    # import gluoncv
+    # from gluoncv import model_zoo, data, utils
+    # import mxnet as mx
+    # #net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True)
+    # os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
+    # net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True, ctx=mx.gpu(0))
+    #
+    # #net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True) #CPU
+    #
+    # # im_fname = utils.download('https://raw.githubusercontent.com/zhreshold/' +
+    # #                           'mxnet-ssd/master/data/demo/dog.jpg',
+    # #                           path='dog.jpg')
+    # # im_fname = utils.download('https://qph.fs.quoracdn.net/main-qimg-da7e37dfb53849a470eb440da2e8c7d5',
+    # #                          path='main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg')
+    # # DiskLocation - C:\Users\Michał\.mxnet\models
+    #
+    # # img = mx.image.imread('HTB1VDPjKkOWBuNjSsppq6xPgpXav.jpg')
+    #
+    # #x, img = data.transforms.presets.yolo.load_test('main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg', short=512)
+    # x, img = data.transforms.presets.yolo.load_test('Lotr2.jpg', short=1024)
+    # #print('coco classes: ', net.classes)
+    # net.reset_class(classes=['person'], reuse_weights=['person'])
+    # # now net has 2 classes as desired
+    # #print('new classes: ', net.classes)
+    # print('Shape of pre-processed image:', x.shape)
+    # os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
+    # x = x.as_in_context(mx.gpu(0))
+    #
+    # startTime = datetime.now()
+    #
+    # class_IDs, scores, bounding_boxs = net(x)
+    #
+    # showExecutionTime(startTime)
+    # return
+    # print(class_IDs)
+    # print(scores[0])
+    # print(bounding_boxs[0])
+    # #print(net.classes)
+    # ax = utils.viz.plot_bbox(img, bounding_boxs[0], scores[0],
+    #                          class_IDs[0], class_names=net.classes, thresh=0.12)
+    #
+    #
+    # plt.show()
+    # return
+    # ##---------------Gluon CV----------------
+
     startTime = datetime.now()
 
     # performAugmentation()
@@ -71,7 +92,7 @@ def main():
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 8
+    batch_size = 92
     # Number of epochs to train for
     num_epochs = 4
 
@@ -103,8 +124,9 @@ def main():
     # instantiate the dataset and dataloader
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
-                                             num_workers=4, pin_memory=True)
+    datasetSize = len(dataset)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
+                                             num_workers=2, pin_memory=True)
 
     # ----
     # Open image
@@ -137,7 +159,9 @@ def main():
     # ---------------------------------
 
     # ---Binary---
+    startTime = datetime.now()#Todo deleteME
     validateBinaryTatoo(dataloader, device, model)  #Todo UNCOMMENT ME
+    showExecutionTime(startTime) #Todo deleteME
     if ('tuned' in modelName):
         return
     # ---Binary---
@@ -209,35 +233,38 @@ def main():
 def validateBinaryTatoo(dataloader, device, model):
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
-    print(labels_map) #Todo DELETE ME
+    #print(labels_map) #Todo DELETE ME
     # Classify with EfficientNet
     maxName = ''
     maxVal = 0
     with torch.no_grad():
+        iteration = 1
+        batchesNumber = (len(dataloader))
         for data, target, paths in dataloader:
             data, target = data.to(device), target.to(device)
-            print(target)
+            #print(target)
             logits1 = model(data)
             index = 0
-            print('----- BATCH -----')
+            #print('----- BATCH {}/{}-----'.format(iteration, batchesNumber))
+            iteration += 1
             for item in logits1:
                 actFileName = paths[index]
-                print(actFileName)
+                #print(actFileName)
                 index += 1
                 preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
-                print(preds1)  # Todo DELETE ME
+                #print(preds1)  # Todo DELETE ME
                 for idx in preds1:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
-                    print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-                    maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob)
-                print('-----')
-            print('maxName: {}'.format(maxName))
-            print('maxVal: {}'.format(maxVal))
+                    #print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                    maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label)
+                #print('-----')
+            #print('maxName: {}'.format(maxName))
+            #print('maxVal: {}'.format(maxVal))
 
 
-def checkMax(maxName, maxVal, inputName, inputVal):
-    if maxVal < inputVal:
+def checkMax(maxName, maxVal, inputName, inputVal, label):
+    if (maxVal < inputVal) & (label == 'similar'):
         maxVal = inputVal
         maxName = inputName
     return (maxName, maxVal)
