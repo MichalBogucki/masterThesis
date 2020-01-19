@@ -5,85 +5,41 @@ import copy
 import torch.optim as optim
 import torch.nn as nn
 import os
-from matplotlib import pyplot as plt
+os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
+
+from performAugmentation import performAugmentation
+from UseGluonCv_YOLO3 import UseGluonCv_YOLO3
+
+os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
+
 from ImageFolderWithPaths import ImageFolderWithPaths
 # from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
-from compareImages import compareImages
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
-from performAugmentation import performAugmentation
 
 import json
 import PIL
 from PIL import Image
-from torchvision import transforms, datasets
+from torchvision import transforms
 
 
 def main():
-
-
-    # ##---------------Gluon CV----------------
-    # import gluoncv
-    # from gluoncv import model_zoo, data, utils
-    # import mxnet as mx
-    # #net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True)
-    # os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
-    # net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True, ctx=mx.gpu(0))
-    #
-    # #net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True) #CPU
-    #
-    # # im_fname = utils.download('https://raw.githubusercontent.com/zhreshold/' +
-    # #                           'mxnet-ssd/master/data/demo/dog.jpg',
-    # #                           path='dog.jpg')
-    # # im_fname = utils.download('https://qph.fs.quoracdn.net/main-qimg-da7e37dfb53849a470eb440da2e8c7d5',
-    # #                          path='main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg')
-    # # DiskLocation - C:\Users\Michał\.mxnet\models
-    #
-    # # img = mx.image.imread('HTB1VDPjKkOWBuNjSsppq6xPgpXav.jpg')
-    #
-    # #x, img = data.transforms.presets.yolo.load_test('main-qimg-da7e37dfb53849a470eb440da2e8c7d5.jpg', short=512)
-    # x, img = data.transforms.presets.yolo.load_test('Lotr2.jpg', short=1024)
-    # #print('coco classes: ', net.classes)
-    # net.reset_class(classes=['person'], reuse_weights=['person'])
-    # # now net has 2 classes as desired
-    # #print('new classes: ', net.classes)
-    # print('Shape of pre-processed image:', x.shape)
-    # os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
-    # x = x.as_in_context(mx.gpu(0))
-    #
-    # startTime = datetime.now()
-    #
-    # class_IDs, scores, bounding_boxs = net(x)
-    #
-    # showExecutionTime(startTime)
-    # return
-    # print(class_IDs)
-    # print(scores[0])
-    # print(bounding_boxs[0])
-    # #print(net.classes)
-    # ax = utils.viz.plot_bbox(img, bounding_boxs[0], scores[0],
-    #                          class_IDs[0], class_names=net.classes, thresh=0.12)
-    #
-    #
-    # plt.show()
-    # return
-    # ##---------------Gluon CV----------------
+    ##---------------Gluon CV----------------
+    UseGluonCv_YOLO3()
+    return
+    return
+    ##---------------Gluon CV----------------
 
     startTime = datetime.now()
 
     # performAugmentation()
 
     # Training settings
-    args = setParserArgumentsMnist()
-
-    useCuda = not args.no_cuda and torch.cuda.is_available()
-    torch.manual_seed(args.seed)
     device = torch.device("cuda")
-    kwargs = {'num_workers': 3, 'pin_memory': True} if useCuda else {}
 
     modelName = 'efficientnet-b0tuned'
-    #modelName = 'efficientnet-b4tuned'
+    # modelName = 'efficientnet-b4tuned'
 
     imageSize = EfficientNet.get_image_size(modelName)
     print("imgSize " + str(imageSize))
@@ -128,40 +84,12 @@ def main():
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
                                              num_workers=2, pin_memory=True)
 
-    # ----
-    # Open image
-    nameViews = [
-        'view_d15.jpg',
-        'view_g15.jpg',
-        'view_m15.jpg',
-        'view_p15.jpg',
-        'view_rl15.jpg',
-        'view_rp15.jpg']
-
-    # return visualizeGraphWithOnnxToNetron(model)
-
-    # compareImages(model, nameViews, tfms)
-    # ---------------------------------
-
-    nameImg = [
-        'building.jpg',
-        'dresKolano.jpg',
-        'dresTatu.jpg',
-        'dresidzie.jpg',
-        'pandaSiedzi.jpg',
-        'pandaSiedzi128.jpg',
-        'pandaStoi.jpg',
-        'pandaStoi200.jpg',
-        'pies.jpg'
-    ]
-
-    # compareImages(model, nameImg, tfms)
-    # ---------------------------------
+    # return visualizeGraphWithOnnxToNetron(model) #ToDo ONYXX vizualiser
 
     # ---Binary---
-    startTime = datetime.now()#Todo deleteME
-    validateBinaryTatoo(dataloader, device, model)  #Todo UNCOMMENT ME
-    showExecutionTime(startTime) #Todo deleteME
+    startTime = datetime.now()  # Todo deleteME
+    validateBinaryTatoo(dataloader, device, model)  # Todo UNCOMMENT ME
+    showExecutionTime(startTime)  # Todo deleteME
     if ('tuned' in modelName):
         return
     # ---Binary---
@@ -176,7 +104,6 @@ def main():
     #  doing feature extract method, we will only update the parameters
     #  that we have just initialized, i.e. the parameters with requires_grad
     #  is True.
-
 
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
@@ -218,14 +145,14 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    validateBinaryTatoo(dataloader, device, model_ft)  #Todo UNCOMMENT ME
+    validateBinaryTatoo(dataloader, device, model_ft)  # Todo UNCOMMENT ME
     # ---Binary---
 
     # ---labels_map---
-    #validateLabelsMap(model_ft, tfms)
+    # validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    #saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
+    # saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
 
@@ -233,34 +160,37 @@ def main():
 def validateBinaryTatoo(dataloader, device, model):
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
-    #print(labels_map) #Todo DELETE ME
+    # print(labels_map) #Todo DELETE ME
     # Classify with EfficientNet
     maxName = ''
     maxVal = 0
+    model.eval()
     with torch.no_grad():
-        iteration = 1
+        batchIteration = 1
         batchesNumber = (len(dataloader))
-        for data, target, paths in dataloader:
-            data, target = data.to(device), target.to(device)
+        for batchData, target, paths in dataloader:
+            batchData, target = batchData.to(device), target.to(device)
+            #print(batchData.shape)
+            #print(type(batchData))
             #print(target)
-            logits1 = model(data)
+            logits1 = model(batchData)
             index = 0
-            #print('----- BATCH {}/{}-----'.format(iteration, batchesNumber))
-            iteration += 1
+            print('----- BATCH {}/{}-----'.format(batchIteration, batchesNumber))
+            batchIteration += 1
             for item in logits1:
                 actFileName = paths[index]
-                #print(actFileName)
+                print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
                 index += 1
-                preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
-                #print(preds1)  # Todo DELETE ME
-                for idx in preds1:
+                predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                #print(predictedClasses)  # Todo DELETE ME
+                for idx in predictedClasses:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
-                    #print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                    print('{:<75} ({:.2f}%)'.format(label, prob * 100))
                     maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label)
-                #print('-----')
-            #print('maxName: {}'.format(maxName))
-            #print('maxVal: {}'.format(maxVal))
+                print('-----')
+            print('maxName: "{}"'.format(maxName))
+            print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
 
 def checkMax(maxName, maxVal, inputName, inputVal, label):
