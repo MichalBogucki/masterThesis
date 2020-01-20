@@ -27,9 +27,9 @@ from torchvision import transforms
 def main():
 
     ##---------------Gluon CV----------------
-    UseGluonCv_YOLO3()
-    return
-    return
+    #UseGluonCv_YOLO3()
+    #return
+    #return
     ##---------------Gluon CV----------------
 
     startTime = datetime.now()
@@ -42,14 +42,15 @@ def main():
     modelName = 'efficientnet-b0tuned'
     # modelName = 'efficientnet-b4tuned'
 
-    imageSize = EfficientNet.get_image_size(modelName)
+    #imageSize = EfficientNet.get_image_size(modelName)
+    imageSize = 40
     print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 92
+    batch_size = 200
     # Number of epochs to train for
     num_epochs = 4
 
@@ -76,14 +77,17 @@ def main():
     # testLoader = torch.utils.data.DataLoader(testDataset,
     #                                          batch_size=8, shuffle=True,
     #                                          num_workers=4, pin_memory=True)
-    data_dir = "jpgImages/aug/val"
+
+    data_dir = "jpgImages/aug/val"#/tiny"
+    #data_dir = "jpgImages/aug/train"
+
     # EXAMPLE USAGE:
     # instantiate the dataset and dataloader
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
     datasetSize = len(dataset)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
-                                             num_workers=2, pin_memory=True)
+                                             num_workers=0, pin_memory=True)
 
     # return visualizeGraphWithOnnxToNetron(model) #ToDo ONYXX vizualiser
 

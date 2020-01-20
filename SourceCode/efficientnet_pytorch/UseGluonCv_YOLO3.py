@@ -42,10 +42,10 @@ def UseGluonCv_YOLO3():
 
 
 def processOneImage(ctx, imageTensor2, imgToDisplay2, iterIndex, net, resultItem, pathDir):
-    #if (iterIndex % 10 == 0):
-    #    mx.gpu(0).empty_cache()
+    if (iterIndex % 50 == 0):
+        mx.gpu(0).empty_cache()
     print()
-    print('memory ', mx.context.gpu_memory_info())
+    print('memory - ', mx.context.gpu_memory_info())
     print('GPU resultItem: ', resultItem)
     # DiskLocation - C:\Users\Michał\.mxnet\models
     threshold = 0.2
@@ -72,10 +72,10 @@ def processOneImage(ctx, imageTensor2, imgToDisplay2, iterIndex, net, resultItem
     #print('filteredScores: ', filteredScores)
     #print('boundingBoxes: ', filteredBoundingBoxes)
     # # print(net.classes)
-    #ax = utils.viz.plot_bbox(imgToDisplay2[iterIndex], filteredBoundingBoxes, filteredScores,
-    #           filteredClassIds, class_names=net.classes, thresh=threshold)
-    #plt.savefig('{}\detected_frames\plot_{}.jpg'.format(pathDir,iterIndex))
-    #plt.close()
+    ax = utils.viz.plot_bbox(imgToDisplay2[iterIndex], filteredBoundingBoxes, filteredScores,
+               filteredClassIds, class_names=net.classes, thresh=threshold)
+    plt.savefig('{}\detected_frames\plot_{}.jpg'.format(pathDir,iterIndex))
+    plt.close()
 
     #print('saved')
     imageTensor2[iterIndex] = []
