@@ -17,12 +17,13 @@ from ImageFolderWithPaths import ImageFolderWithPaths
 from setParserArguments import setParserArgumentsMnist
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
-
+import torchvision
 import json
 import PIL
 from PIL import Image
 from torchvision import transforms
-
+from matplotlib import pyplot as plt
+import numpy as np
 
 def main():
 
@@ -43,14 +44,14 @@ def main():
     # modelName = 'efficientnet-b4tuned'
 
     #imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 40
+    imageSize = 200
     print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 200
+    batch_size = 12
     # Number of epochs to train for
     num_epochs = 4
 
@@ -78,8 +79,8 @@ def main():
     #                                          batch_size=8, shuffle=True,
     #                                          num_workers=4, pin_memory=True)
 
-    data_dir = "jpgImages/aug/val"#/tiny"
-    #data_dir = "jpgImages/aug/train"
+    #data_dir = "jpgImages/aug/val"#/tiny"
+    data_dir = "jpgImages/aug/train"
 
     # EXAMPLE USAGE:
     # instantiate the dataset and dataloader
@@ -94,6 +95,8 @@ def main():
     # ---Binary---
     startTime = datetime.now()  # Todo deleteME
     validateBinaryTatoo(dataloader, device, model)  # Todo UNCOMMENT ME
+    return
+
     showExecutionTime(startTime)  # Todo deleteME
     if ('tuned' in modelName):
         return
@@ -175,16 +178,59 @@ def validateBinaryTatoo(dataloader, device, model):
         batchesNumber = (len(dataloader))
         for batchData, target, paths in dataloader:
             batchData, target = batchData.to(device), target.to(device)
-            #print(batchData.shape)
-            #print(type(batchData))
-            #print(target)
+            print('batchData.shape')
+            print(batchData.shape)
+            print(type(batchData))
+            print('target')
+            print(target)
+            print('target.shape: {}'.format(target.shape))
             logits1 = model(batchData)
             index = 0
             print('----- BATCH {}/{}-----'.format(batchIteration, batchesNumber))
             batchIteration += 1
             for item in logits1:
                 actFileName = paths[index]
+                imgTemp = batchData[index]
+                print('batchData[index]shape: {}'.format(imgTemp.shape))
+                #ime = imgTemp.crop((left, top, right, bottom))
+                left, top, right, bottom = 0,0,224,128
+                imgCropped = imgTemp[:, top:bottom, left:right]
+                print('imgCropped: {}'.format(imgCropped.shape))
+                print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
+                foldSize = 40
+                step = 4
+                ############### ---------- folding images into SmallerImages ---------- ##############
+                imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+                print('imgTempPatches2x2x3x50x50.shape: {}'.format(imgTempPatches2x2x3x50x50.shape))
+                flate2 = torch.flatten(imgTempPatches2x2x3x50x50, 0, 1)
+                print('flat4x3x25x25.shape: {}'.format(flate2.shape))
+                print('flat[0].shape: {}'.format(flate2[0].shape))
+                # ++++++++++ put flatted smallImages into NN +++++++++++++ #
+                nnOutput = model(flate2)
+                x2 = 1
+                y2 = 1
+                for item2 in nnOutput:
+                    predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
+                    if (x2 == 42 ):
+                        x2 = 1
+                        y2 = (y2 + 1)
+                    for idx2 in predictedClasses2:
+                        label2 = labels_map[idx2]
+                        prob2 = torch.softmax(item2, dim=0)[idx2].item()
+                        #print('Cropped x={} y={} {:<75} ({:.2f}%)'.format(x2, y2, label2, prob2 * 100))
+                    x2 = (x2 + 1)
+                # ++++++++++ put flatted smallImages into NN +++++++++++++ #
+
+                #imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
+                #plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
+                #transforms.ToPILImage()(transforms.ToTensor()(image)), interpolation = "bicubic"
+                #plt.show()
+                #torchvision.utils.save_image(imgFromTensor, 'flate2.png')
+
+                ############### ---------- folding images into SmallerImages ---------- ##############
+
+                print('savedImage')
                 index += 1
                 predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
                 #print(predictedClasses)  # Todo DELETE ME
@@ -193,6 +239,7 @@ def validateBinaryTatoo(dataloader, device, model):
                     prob = torch.softmax(item, dim=0)[idx].item()
                     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
                     maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label)
+                    return
                 print('-----')
             print('maxName: "{}"'.format(maxName))
             print('maxVal: ({:.2f}%)'.format(maxVal * 100))
