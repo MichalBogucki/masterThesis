@@ -44,7 +44,7 @@ def main():
     # modelName = 'efficientnet-b4tuned'
 
     #imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 421
+    imageSize = 573
     #print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
@@ -199,8 +199,8 @@ def validateBinaryTatoo(dataloader, device, model):
                 print('imgCropped: {}'.format(imgCropped.shape))
                 print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
-                foldSize = 90
-                step = 15
+                foldSize = 150
+                step = 150
                 startTime = datetime.now() #todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
@@ -226,8 +226,8 @@ def validateBinaryTatoo(dataloader, device, model):
                         #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
                         maxName, maxVal = checkMax(maxName, maxVal, tempName, prob2, label2, idx2)
                         if (idx2 == 1):
-                            #print('{}x{}'.format(x2,y2), end=";")
-                            print('{:.0f}'.format(prob2 * 100), end=";")
+                            print('{}x{}'.format(x2,y2), end=";")
+                            #print('{:.0f}'.format(prob2 * 100), end=";")
                     x2 = (x2 + step)
 
                         #print('{:.0f}'.format(prob2 * 100), end=";")
