@@ -30,9 +30,9 @@ def UseGluonCv_YOLO3():
     #imList = mx.nd.array(imageTensor2)
     #print(type(imList))
     print('len: ', len(result))
-    f = open('{}\detected.csv'.format(pathDir), "a")
-    f.write("fileName;probScore;xTopLeft;yTopLeft;xDownRight;yDownRight;\n")
-    f.close()
+    #f = open('{}\detected.csv'.format(pathDir), "a")
+    #f.write("fileName;probScore;xTopLeft;yTopLeft;xDownRight;yDownRight;\n")
+    #f.close()
     for iterIndex, resultItem in enumerate(result):
         processOneImage(ctx, imageTensor2, imgToDisplay2, iterIndex, net, resultItem, pathDir)
 
@@ -49,10 +49,10 @@ def processOneImage(ctx, imageTensor2, imgToDisplay2, iterIndex, net, resultItem
     print('GPU resultItem: ', resultItem)
     # DiskLocation - C:\Users\Michał\.mxnet\models
     threshold = 0.2
-    # imageTensor, imgToDisplay = data.transforms.presets.yolo.load_test('Lotr2.jpg', short=1024)
-    # imageTensor, imgToDisplay = data.transforms.presets.yolo.load_test(resultItem)#, short=1024)
-    # print('imageTensor.shape', imageTensor.shape)
-    # print('imgToDisplay.shape', imgToDisplay.shape)
+    #imageTensor, imgToDisplay = data.transforms.presets.yolo.load_test('Lotr2.jpg', short=1024)
+    #imageTensor, imgToDisplay = data.transforms.presets.yolo.load_test(resultItem)#, short=1024)
+    print('imageTensor2.shape', imageTensor2[iterIndex].shape)
+    print('imgToDisplay2.shape', imgToDisplay2[iterIndex].shape)
     # print('coco classes: ', net.classes)
     net.reset_class(classes=['person'], reuse_weights=['person'])
     # now net has 2 classes as desired
@@ -72,19 +72,19 @@ def processOneImage(ctx, imageTensor2, imgToDisplay2, iterIndex, net, resultItem
     #print('filteredScores: ', filteredScores)
     #print('boundingBoxes: ', filteredBoundingBoxes)
     # # print(net.classes)
-    ax = utils.viz.plot_bbox(imgToDisplay2[iterIndex], filteredBoundingBoxes, filteredScores,
-               filteredClassIds, class_names=net.classes, thresh=threshold)
-    plt.savefig('{}\detected_frames\plot_{}.jpg'.format(pathDir,iterIndex))
-    plt.close()
+    #ax = utils.viz.plot_bbox(imgToDisplay2[iterIndex], filteredBoundingBoxes, filteredScores,
+    #          filteredClassIds, class_names=net.classes, thresh=threshold)
+    #plt.savefig('{}\detected_frames\plot_{}.jpg'.format(pathDir,iterIndex))
+    #plt.close()
 
     #print('saved')
     imageTensor2[iterIndex] = []
     #mx.gpu(0).empty_cache()
-    f = open('{}\detected.csv'.format(pathDir), "a")
+    #f = open('{}\detected.csv'.format(pathDir), "a")
     #f.write("fileName;probScore;xTopLeft;yTopLeft;xDownRight;yDownRight;\n")
-    for i in range(thresholdIndex):
-        f.write('{};{:.2f};{:.2f};{:.2f};{:.2f};{:.2f};\n'.format(str(resultItem) , filteredScores[i].asnumpy().item(0), filteredBoundingBoxes[i][0].asnumpy().item(0), filteredBoundingBoxes[i][1].asnumpy().item(0), filteredBoundingBoxes[i][2].asnumpy().item(0),filteredBoundingBoxes[i][3].asnumpy().item(0)))
-    f.close()
+    #for i in range(thresholdIndex):
+    #    f.write('{};{:.2f};{:.2f};{:.2f};{:.2f};{:.2f};\n'.format(str(resultItem) , filteredScores[i].asnumpy().item(0), filteredBoundingBoxes[i][0].asnumpy().item(0), filteredBoundingBoxes[i][1].asnumpy().item(0), filteredBoundingBoxes[i][2].asnumpy().item(0),filteredBoundingBoxes[i][3].asnumpy().item(0)))
+    #f.close()
     return
 
     # plt.show()

@@ -44,14 +44,14 @@ def main():
     # modelName = 'efficientnet-b4tuned'
 
     #imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 200
-    print("imgSize " + str(imageSize))
+    imageSize = 576
+    #print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 12
+    batch_size = 1
     # Number of epochs to train for
     num_epochs = 4
 
@@ -63,8 +63,8 @@ def main():
 
     # Preprocess image
     tfms = transforms.Compose([
-        transforms.Resize(imageSize, interpolation=PIL.Image.BICUBIC),
-        transforms.CenterCrop(imageSize),
+        transforms.Resize(size=imageSize, interpolation=PIL.Image.BICUBIC),
+        #transforms.CenterCrop(imageSize),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
@@ -198,30 +198,36 @@ def validateBinaryTatoo(dataloader, device, model):
                 print('imgCropped: {}'.format(imgCropped.shape))
                 print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
-                foldSize = 40
-                step = 4
+                foldSize = 80
+                step = 20
+                startTime = datetime.now() #todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
                 print('imgTempPatches2x2x3x50x50.shape: {}'.format(imgTempPatches2x2x3x50x50.shape))
                 flate2 = torch.flatten(imgTempPatches2x2x3x50x50, 0, 1)
                 print('flat4x3x25x25.shape: {}'.format(flate2.shape))
                 print('flat[0].shape: {}'.format(flate2[0].shape))
+                #100x100; 200x100; 300x100; 400x100
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
                 nnOutput = model(flate2)
-                x2 = 1
-                y2 = 1
+                x2 = foldSize
+                y2 = foldSize
                 for item2 in nnOutput:
                     predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
-                    if (x2 == 42 ):
-                        x2 = 1
-                        y2 = (y2 + 1)
+                    if (x2 > imgTemp.size(2)):
+                        x2 = foldSize
+                        y2 = (y2 + step)
                     for idx2 in predictedClasses2:
                         label2 = labels_map[idx2]
                         prob2 = torch.softmax(item2, dim=0)[idx2].item()
-                        #print('Cropped x={} y={} {:<75} ({:.2f}%)'.format(x2, y2, label2, prob2 * 100))
-                    x2 = (x2 + 1)
+                        tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2,prob2*100,(x2-foldSize), (y2-foldSize),x2,y2)
+                        print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
+                        maxName, maxVal = checkMax(maxName, maxVal, tempName, prob2, label2, idx2)
+                    x2 = (x2 + step)
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
-
+                showExecutionTime(startTime) #todo delete ME --time--
+                print('maxName: "{}"'.format(maxName))
+                print('maxVal: ({:.2f}%)'.format(maxVal * 100))
                 #imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
                 #plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
                 #transforms.ToPILImage()(transforms.ToTensor()(image)), interpolation = "bicubic"
@@ -238,15 +244,15 @@ def validateBinaryTatoo(dataloader, device, model):
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
                     print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-                    maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label)
+                    #maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label, idx)
                     return
                 print('-----')
             print('maxName: "{}"'.format(maxName))
             print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
 
-def checkMax(maxName, maxVal, inputName, inputVal, label):
-    if (maxVal < inputVal) & (label == 'similar'):
+def checkMax(maxName, maxVal, inputName, inputVal, label, idx2):
+    if (maxVal < inputVal) & (idx2 == 1):
         maxVal = inputVal
         maxName = inputName
     return (maxName, maxVal)
