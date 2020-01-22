@@ -44,7 +44,7 @@ def main():
     # modelName = 'efficientnet-b4tuned'
 
     #imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 576
+    imageSize = 421
     #print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
@@ -200,7 +200,7 @@ def validateBinaryTatoo(dataloader, device, model):
                 print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
                 foldSize = 90
-                step = 30
+                step = 15
                 startTime = datetime.now() #todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
@@ -216,15 +216,21 @@ def validateBinaryTatoo(dataloader, device, model):
                 for item2 in nnOutput:
                     predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
                     if (x2 > imgTemp.size(2)):
+                        print('')
                         x2 = foldSize
                         y2 = (y2 + step)
                     for idx2 in predictedClasses2:
                         label2 = labels_map[idx2]
                         prob2 = torch.softmax(item2, dim=0)[idx2].item()
                         tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2,prob2*100,(x2-foldSize), (y2-foldSize),x2,y2)
-                        print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
+                        #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
                         maxName, maxVal = checkMax(maxName, maxVal, tempName, prob2, label2, idx2)
+                        if (idx2 == 1):
+                            #print('{}x{}'.format(x2,y2), end=";")
+                            print('{:.0f}'.format(prob2 * 100), end=";")
                     x2 = (x2 + step)
+
+                        #print('{:.0f}'.format(prob2 * 100), end=";")
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
                 showExecutionTime(startTime) #todo delete ME --time--
                 print('maxName: "{}"'.format(maxName))
