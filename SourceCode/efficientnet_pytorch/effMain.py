@@ -80,7 +80,8 @@ def main():
     #                                          num_workers=4, pin_memory=True)
 
     #data_dir = "jpgImages/aug/val"#/tiny"
-    data_dir = "jpgImages/aug/train"
+    #data_dir = "jpgImages/aug/train"
+    data_dir = "UseMeMaui"
 
     # EXAMPLE USAGE:
     # instantiate the dataset and dataloader
@@ -198,8 +199,8 @@ def validateBinaryTatoo(dataloader, device, model):
                 print('imgCropped: {}'.format(imgCropped.shape))
                 print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
-                foldSize = 80
-                step = 20
+                foldSize = 90
+                step = 30
                 startTime = datetime.now() #todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
