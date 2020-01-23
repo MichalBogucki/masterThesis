@@ -194,29 +194,32 @@ def validateBinaryTatoo(dataloader, device, model):
                 imgTemp = batchData[index]
                 print('batchData[index]shape: {}'.format(imgTemp.shape))
                 #ime = imgTemp.crop((left, top, right, bottom))
-                left, top, right, bottom = 0,0,224,128
+                left, top, right, bottom = 300,100,650,500
                 imgCropped = imgTemp[:, top:bottom, left:right]
+                #imgCropped = imgTemp
                 print('imgCropped: {}'.format(imgCropped.shape))
                 print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
                 print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
-                foldSize = 150
-                step = 150
+                foldSize = 100
+                step = 20
                 startTime = datetime.now() #todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
-                imgTempPatches2x2x3x50x50 = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
-                print('imgTempPatches2x2x3x50x50.shape: {}'.format(imgTempPatches2x2x3x50x50.shape))
-                flate2 = torch.flatten(imgTempPatches2x2x3x50x50, 0, 1)
-                print('flat4x3x25x25.shape: {}'.format(flate2.shape))
-                print('flat[0].shape: {}'.format(flate2[0].shape))
+                #imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+                imgTempPatches = imgCropped.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+                print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
+                flate2 = torch.flatten(imgTempPatches, 0, 1)
+                print('flate2.shape: {}'.format(flate2.shape))
+                print('flate2[0].shape: {}'.format(flate2[0].shape))
                 #100x100; 200x100; 300x100; 400x100
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
                 nnOutput = model(flate2)
                 x2 = foldSize
                 y2 = foldSize
                 for item2 in nnOutput:
-                    predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
-                    if (x2 > imgTemp.size(2)):
-                        print('')
+                    #predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
+                    predictedClasses2 = torch.topk(item2, k=2)[1].squeeze(0).tolist()
+                    if (x2 > imgCropped.size(2)):
+                        #print('')
                         x2 = foldSize
                         y2 = (y2 + step)
                     for idx2 in predictedClasses2:
@@ -225,8 +228,8 @@ def validateBinaryTatoo(dataloader, device, model):
                         tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2,prob2*100,(x2-foldSize), (y2-foldSize),x2,y2)
                         #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
                         maxName, maxVal = checkMax(maxName, maxVal, tempName, prob2, label2, idx2)
-                        if (idx2 == 1):
-                            print('{}x{}'.format(x2,y2), end=";")
+                        #if (idx2 == 1):
+                            #print('{}x{}'.format(x2,y2), end=";")
                             #print('{:.0f}'.format(prob2 * 100), end=";")
                     x2 = (x2 + step)
 
@@ -245,7 +248,8 @@ def validateBinaryTatoo(dataloader, device, model):
 
                 print('savedImage')
                 index += 1
-                predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                #predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                predictedClasses = torch.topk(item, k=2)[1].squeeze(0).tolist()
                 #print(predictedClasses)  # Todo DELETE ME
                 for idx in predictedClasses:
                     label = labels_map[idx]
@@ -274,7 +278,8 @@ def validateLabelsMap(model, tfms):
     model.eval()
     with torch.no_grad():
         logits1 = model(img1)
-        preds1 = torch.topk(logits1, k=2).indices.squeeze(0).tolist()
+        #preds1 = torch.topk(logits1, k=2).indices.squeeze(0).tolist()
+        preds1 = torch.topk(logits1, k=2)[1].squeeze(0).tolist()
         print('-----')
         for idx in preds1:
             label = labels_map[idx]
