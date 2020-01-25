@@ -5,6 +5,8 @@ import copy
 import torch.optim as optim
 import torch.nn as nn
 import os
+import csv
+
 os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
 
 from performAugmentation import performAugmentation
@@ -23,14 +25,15 @@ import PIL
 from PIL import Image
 from torchvision import transforms
 from matplotlib import pyplot as plt
+from matplotlib import patches
 import numpy as np
 
-def main():
 
+def main():
     ##---------------Gluon CV----------------
-    #UseGluonCv_YOLO3()
-    #return
-    #return
+    # UseGluonCv_YOLO3()
+    # return
+    # return
     ##---------------Gluon CV----------------
 
     startTime = datetime.now()
@@ -43,9 +46,9 @@ def main():
     modelName = 'efficientnet-b0tuned'
     # modelName = 'efficientnet-b4tuned'
 
-    #imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 573
-    #print("imgSize " + str(imageSize))
+    # imageSize = EfficientNet.get_image_size(modelName)
+    imageSize = 576
+    # print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
@@ -64,7 +67,7 @@ def main():
     # Preprocess image
     tfms = transforms.Compose([
         transforms.Resize(size=imageSize, interpolation=PIL.Image.BICUBIC),
-        #transforms.CenterCrop(imageSize),
+        # transforms.CenterCrop(imageSize),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
@@ -79,9 +82,16 @@ def main():
     #                                          batch_size=8, shuffle=True,
     #                                          num_workers=4, pin_memory=True)
 
-    #data_dir = "jpgImages/aug/val"#/tiny"
-    #data_dir = "jpgImages/aug/train"
+    # data_dir = "jpgImages/aug/val"#/tiny"
+    # data_dir = "jpgImages/aug/train"
     data_dir = "UseMeMaui"
+
+    # #$$$$$$$$$$ CSV USING $$$$$$$$$$$$
+    # listOfCsvRows = ReadCsvToList(data_dir)
+    # fileName ='jpgImages\\video\\frames\\moana_1080p_2min 004.jpg'
+    # searchedValue = SearchCollectionForValue(fileName, listOfCsvRows)
+    # print(searchedValue)
+    # $$$$$$$$$$ CSV USING $$$$$$$$$$$$
 
     # EXAMPLE USAGE:
     # instantiate the dataset and dataloader
@@ -95,7 +105,8 @@ def main():
 
     # ---Binary---
     startTime = datetime.now()  # Todo deleteME
-    validateBinaryTatoo(dataloader, device, model)  # Todo UNCOMMENT ME
+    validateBinaryTatoo(dataloader, device, model, data_dir, tfms)  # Todo UNCOMMENT ME
+    showExecutionTime(startTime)  # Todo deleteME
     return
 
     showExecutionTime(startTime)  # Todo deleteME
@@ -166,107 +177,182 @@ def main():
     showExecutionTime(startTime)
 
 
-def validateBinaryTatoo(dataloader, device, model):
+def SearchCollectionForValue(fileName, listOfCsvRows):
+    # searchedValue = 0
+    # for row in listOfCsvRows:
+    #     if row[0] == fileName:
+    #         searchedValue = row[1]
+    #         break
+    searchedFloatValue = [item[2:6] for item in listOfCsvRows if (fileName in item[0])]
+    intCoordinates = [int(float(i)) for i in searchedFloatValue[0]]
+    return intCoordinates
+
+
+def ReadCsvToList(data_dir):
+    listOfCsvRows = []
+    with open('{}\detected.csv'.format(data_dir), 'r') as f:
+    #with open('{}\detected_single.csv'.format(data_dir), 'r') as f:
+        reader = csv.reader(f, delimiter=';')
+        for row in reader:
+            listOfCsvRows.append(row)
+    return listOfCsvRows
+
+
+def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
     # print(labels_map) #Todo DELETE ME
     # Classify with EfficientNet
-    maxName = ''
-    maxVal = 0
     model.eval()
     with torch.no_grad():
         batchIteration = 1
-        batchesNumber = (len(dataloader))
-        for batchData, target, paths in dataloader:
-            batchData, target = batchData.to(device), target.to(device)
-            print('batchData.shape')
-            print(batchData.shape)
-            print(type(batchData))
-            print('target')
-            print(target)
-            print('target.shape: {}'.format(target.shape))
+        listOfCsvRows = ReadCsvToList(data_dir)
+        skipped = SkipFirstCsvRow(listOfCsvRows)
+        batchesNumber = (len(skipped))
+        for row in skipped:
+        #for batchData, target, paths in dataloader:
+        #    batchData, target = batchData.to(device), target.to(device)
+            actFileNameWithPath = row[0]
+            onlyFileName = os.path.basename(actFileNameWithPath)
+            loadImg = Image.open("{}/output/{}".format(data_dir, onlyFileName))
+            #print(onlyFileName)
+            batchData = tfms(loadImg).unsqueeze(0).cuda()
+            maxName = ''
+            maxVal = 0
+            xBest = 0
+            yBest = 0
+            #print('batchData.shape')
+            #print(batchData.shape)
+            #print(type(batchData))
+            #print('target')
+            #print(target)
+            #print('target.shape: {}'.format(target.shape))
             logits1 = model(batchData)
             index = 0
             print('----- BATCH {}/{}-----'.format(batchIteration, batchesNumber))
             batchIteration += 1
             for item in logits1:
-                actFileName = paths[index]
-                imgTemp = batchData[index]
-                print('batchData[index]shape: {}'.format(imgTemp.shape))
-                #ime = imgTemp.crop((left, top, right, bottom))
-                left, top, right, bottom = 300,100,650,500
+                #actFileNameWithPath = paths[index]
+                #onlyFileName = os.path.basename(actFileNameWithPath)
+                #searchedValue = SearchCollectionForValue(onlyFileName, listOfCsvRows)
+                #print('batchData.shape: {}'.format(batchData.shape))
+                #imgTemp = batchData[index]
+                imgTemp = batchData.squeeze(0) #ToDo because readImg is 4d not 3d (0th is useless)
+                #print('batchData[index]shape: {}'.format(imgTemp.shape))
+                # ime = imgTemp.crop((left, top, right, bottom))
+                #left, top, right, bottom = 300, 100, 650, 500
+                #print(onlyFileName)
+                #print(searchedValue)
+#                print('imgTemp: {}'.format(imgTemp.shape))
+                left, top, right, bottom = [int(float(i)) for i in row[2:6]]
                 imgCropped = imgTemp[:, top:bottom, left:right]
-                #imgCropped = imgTemp
-                print('imgCropped: {}'.format(imgCropped.shape))
-                print('img.size(0)={}, img.size(1)={}img.size(2)={} '.format(imgTemp.size(0),imgTemp.size(1),imgTemp.size(2)))
-                print('{}/{} "{}"'.format(index+1, len(logits1), actFileName))
-                foldSize = 100
-                step = 20
-                startTime = datetime.now() #todo delete ME --time--
+                #print('imgCropped: {}'.format(imgCropped.shape))
+                #print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
+                #                                                            imgTemp.size(2)))
+                #print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
+                foldSize = 150
+                step = 40
+
+                minFromXY = min([imgCropped.size(1), imgCropped.size(2)])
+                if (minFromXY< 150):
+                    foldSize = minFromXY
+                    step = int (minFromXY / 5)
+
+
+                #startTime = datetime.now()  # todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
-                #imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+                # imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
                 imgTempPatches = imgCropped.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
-                print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
+                #print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
                 flate2 = torch.flatten(imgTempPatches, 0, 1)
-                print('flate2.shape: {}'.format(flate2.shape))
-                print('flate2[0].shape: {}'.format(flate2[0].shape))
-                #100x100; 200x100; 300x100; 400x100
+                #print('flate2.shape: {}'.format(flate2.shape))
+                #print('flate2[0].shape: {}'.format(flate2[0].shape))
+                # 100x100; 200x100; 300x100; 400x100
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
                 nnOutput = model(flate2)
                 x2 = foldSize
                 y2 = foldSize
                 for item2 in nnOutput:
-                    #predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
+                    # predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
                     predictedClasses2 = torch.topk(item2, k=2)[1].squeeze(0).tolist()
                     if (x2 > imgCropped.size(2)):
-                        #print('')
+                        # print('')
                         x2 = foldSize
                         y2 = (y2 + step)
                     for idx2 in predictedClasses2:
                         label2 = labels_map[idx2]
                         prob2 = torch.softmax(item2, dim=0)[idx2].item()
-                        tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2,prob2*100,(x2-foldSize), (y2-foldSize),x2,y2)
-                        #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
-                        maxName, maxVal = checkMax(maxName, maxVal, tempName, prob2, label2, idx2)
-                        #if (idx2 == 1):
-                            #print('{}x{}'.format(x2,y2), end=";")
-                            #print('{:.0f}'.format(prob2 * 100), end=";")
+                        tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2, prob2 * 100, (x2 - foldSize),
+                                                                          (y2 - foldSize), x2, y2)
+                        # print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
+                        maxName, maxVal, xBest, yBest = checkMax(maxName, maxVal, tempName, prob2, label2, idx2,
+                                                                 xBest, yBest, x2 - foldSize, y2 - foldSize)
+                        # if (idx2 == 1):
+                        # print('{}x{}'.format(x2,y2), end=";")
+                        # print('{:.0f}'.format(prob2 * 100), end=";")
                     x2 = (x2 + step)
 
-                        #print('{:.0f}'.format(prob2 * 100), end=";")
+                    # print('{:.0f}'.format(prob2 * 100), end=";")
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
-                showExecutionTime(startTime) #todo delete ME --time--
-                print('maxName: "{}"'.format(maxName))
-                print('maxVal: ({:.2f}%)'.format(maxVal * 100))
-                #imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
-                #plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
-                #transforms.ToPILImage()(transforms.ToTensor()(image)), interpolation = "bicubic"
-                #plt.show()
-                #torchvision.utils.save_image(imgFromTensor, 'flate2.png')
+                #showExecutionTime(startTime)  # todo delete ME --time--
+                #print('maxName: "{}"'.format(maxName))
+                #print('maxVal: ({:.2f}%)'.format(maxVal * 100))
+
+                showImgOnPlot(imgTemp, left+xBest, top+yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal)
+
+                # imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
+                # plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
+                # transforms.ToPILImage()(transforms.ToTensor()(image)), interpolation = "bicubic"
+                # plt.show()
+                # torchvision.utils.save_image(imgFromTensor, 'flate2.png')
 
                 ############### ---------- folding images into SmallerImages ---------- ##############
 
-                print('savedImage')
+                #print('savedImage')
                 index += 1
-                #predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                # predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
                 predictedClasses = torch.topk(item, k=2)[1].squeeze(0).tolist()
-                #print(predictedClasses)  # Todo DELETE ME
+                # print(predictedClasses)  # Todo DELETE ME
                 for idx in predictedClasses:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
-                    print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-                    #maxName, maxVal = checkMax(maxName, maxVal, actFileName, prob, label, idx)
-                    return
-                print('-----')
-            print('maxName: "{}"'.format(maxName))
-            print('maxVal: ({:.2f}%)'.format(maxVal * 100))
+                    #print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                    # maxName, maxVal = checkMax(maxName, maxVal, actFileNameWithPath, prob, label, idx)
+                    #return
+                #print('-----')
+            #print('maxName: "{}"'.format(maxName))
+            #print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
 
-def checkMax(maxName, maxVal, inputName, inputVal, label, idx2):
-    if (maxVal < inputVal) & (idx2 == 1):
+def SkipFirstCsvRow(listOfCsvRows):
+    return listOfCsvRows[1:]
+
+
+def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, score):
+    if (score * 100 > 65):
+        imgCroppedToCup = np.transpose(UnNormalize(imgTemp).cpu(), (1, 2, 0))
+        figure, axis = plt.subplots(1)
+        # Display the image
+        axis.imshow(imgCroppedToCup)
+        axis.text(left, top, '{:.2f}'.format(score*100), fontsize=10, color = 'lime')
+        # Create a Rectangle patch
+        # rect = patches.Rectangle((50, 100), 40, 30, linewidth=1, edgecolor='cyan', facecolor='none')
+        rect = patches.Rectangle((left, top), width, height, linewidth=1, edgecolor='lime', facecolor='none')
+        # plt.axis('off')
+        # Add the patch to the Axes
+        axis.add_patch(rect)
+        #plt.show()
+        plt.savefig('{}\detected\{}_D.png'.format(data_dir, onlyFileName))
+        plt.close()
+
+
+def checkMax(maxName, maxVal, inputName, inputVal, label, idx2, xBest, yBest, xTemp, yTemp):
+    if (maxVal < inputVal) & (idx2 == 1) & (inputVal * 100 > 60):
         maxVal = inputVal
         maxName = inputName
-    return (maxName, maxVal)
+        xBest = xTemp
+        yBest = yTemp
+    return (maxName, maxVal, xBest, yBest)
 
 
 def validateLabelsMap(model, tfms):
@@ -278,7 +364,7 @@ def validateLabelsMap(model, tfms):
     model.eval()
     with torch.no_grad():
         logits1 = model(img1)
-        #preds1 = torch.topk(logits1, k=2).indices.squeeze(0).tolist()
+        # preds1 = torch.topk(logits1, k=2).indices.squeeze(0).tolist()
         preds1 = torch.topk(logits1, k=2)[1].squeeze(0).tolist()
         print('-----')
         for idx in preds1:
@@ -369,6 +455,14 @@ def set_parameter_requires_grad(model, feature_extracting):
 
 def saveTrainedModel(model, name):
     torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000.pth")
+
+
+def UnNormalize(tensor):
+    mean = (0.485, 0.456, 0.406)
+    std = (0.229, 0.224, 0.225)
+    for t, m, s in zip(tensor, mean, std):
+        t.mul_(s).add_(m)
+    return tensor
 
 
 if __name__ == '__main__':
