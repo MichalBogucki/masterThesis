@@ -42,19 +42,19 @@ def main():
 
     # Training settings
     device = torch.device("cuda")
-
-    modelName = 'efficientnet-b0tuned'
+    modelName = 'efficientnet-b0'
+    # modelName = 'efficientnet-b0'
     # modelName = 'efficientnet-b4tuned'
 
-    # imageSize = EfficientNet.get_image_size(modelName)
-    imageSize = 576
-    # print("imgSize " + str(imageSize))
+    imageSize = EfficientNet.get_image_size(modelName)  # Todo for training
+    # imageSize = 576
+    print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 1
+    batch_size = 6
     # Number of epochs to train for
     num_epochs = 4
 
@@ -67,7 +67,7 @@ def main():
     # Preprocess image
     tfms = transforms.Compose([
         transforms.Resize(size=imageSize, interpolation=PIL.Image.BICUBIC),
-        # transforms.CenterCrop(imageSize),
+        transforms.CenterCrop(imageSize),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
@@ -84,7 +84,8 @@ def main():
 
     # data_dir = "jpgImages/aug/val"#/tiny"
     # data_dir = "jpgImages/aug/train"
-    data_dir = "UseMeMaui"
+    # data_dir = "UseMeMaui"
+    data_dir = "jpgImages/aug/val"
 
     # #$$$$$$$$$$ CSV USING $$$$$$$$$$$$
     # listOfCsvRows = ReadCsvToList(data_dir)
@@ -98,16 +99,18 @@ def main():
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
     datasetSize = len(dataset)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False,
-                                             num_workers=0, pin_memory=True)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
+                                             num_workers=4, pin_memory=True)
 
     # return visualizeGraphWithOnnxToNetron(model) #ToDo ONYXX vizualiser
 
     # ---Binary---
-    startTime = datetime.now()  # Todo deleteME
-    validateBinaryTatoo(dataloader, device, model, data_dir, tfms)  # Todo UNCOMMENT ME
-    showExecutionTime(startTime)  # Todo deleteME
-    return
+    # startTime = datetime.now()  # Todo deleteME
+    # measureDatasetAccuracy(dataloader, device, model)  # Todo UNCOMMENT ME
+    # showExecutionTime(startTime)  # Todo deleteME
+    # return
+    # return
+    # return
 
     showExecutionTime(startTime)  # Todo deleteME
     if ('tuned' in modelName):
@@ -165,14 +168,14 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    validateBinaryTatoo(dataloader, device, model_ft)  # Todo UNCOMMENT ME
+    # validateBinaryTatoo(dataloader, device, model, data_dir, tfms) # Todo UNCOMMENT ME
     # ---Binary---
 
     # ---labels_map---
     # validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    # saveTrainedModel(model, modelName) #Todo UNCOMMENT ME
+    #saveTrainedModel(model, modelName)  # Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
 
@@ -191,7 +194,7 @@ def SearchCollectionForValue(fileName, listOfCsvRows):
 def ReadCsvToList(data_dir):
     listOfCsvRows = []
     with open('{}\detected.csv'.format(data_dir), 'r') as f:
-    #with open('{}\detected_single.csv'.format(data_dir), 'r') as f:
+        # with open('{}\detected_single.csv'.format(data_dir), 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
             listOfCsvRows.append(row)
@@ -210,63 +213,62 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
         skipped = SkipFirstCsvRow(listOfCsvRows)
         batchesNumber = (len(skipped))
         for row in skipped:
-        #for batchData, target, paths in dataloader:
-        #    batchData, target = batchData.to(device), target.to(device)
+            # for batchData, target, paths in dataloader:
+            #    batchData, target = batchData.to(device), target.to(device)
             actFileNameWithPath = row[0]
             onlyFileName = os.path.basename(actFileNameWithPath)
             loadImg = Image.open("{}/output/{}".format(data_dir, onlyFileName))
-            #print(onlyFileName)
+            # print(onlyFileName)
             batchData = tfms(loadImg).unsqueeze(0).cuda()
             maxName = ''
             maxVal = 0
             xBest = 0
             yBest = 0
-            #print('batchData.shape')
-            #print(batchData.shape)
-            #print(type(batchData))
-            #print('target')
-            #print(target)
-            #print('target.shape: {}'.format(target.shape))
+            # print('batchData.shape')
+            # print(batchData.shape)
+            # print(type(batchData))
+            # print('target')
+            # print(target)
+            # print('target.shape: {}'.format(target.shape))
             logits1 = model(batchData)
             index = 0
             print('----- BATCH {}/{}-----'.format(batchIteration, batchesNumber))
             batchIteration += 1
             for item in logits1:
-                #actFileNameWithPath = paths[index]
-                #onlyFileName = os.path.basename(actFileNameWithPath)
-                #searchedValue = SearchCollectionForValue(onlyFileName, listOfCsvRows)
-                #print('batchData.shape: {}'.format(batchData.shape))
-                #imgTemp = batchData[index]
-                imgTemp = batchData.squeeze(0) #ToDo because readImg is 4d not 3d (0th is useless)
-                #print('batchData[index]shape: {}'.format(imgTemp.shape))
+                # actFileNameWithPath = paths[index]
+                # onlyFileName = os.path.basename(actFileNameWithPath)
+                # searchedValue = SearchCollectionForValue(onlyFileName, listOfCsvRows)
+                # print('batchData.shape: {}'.format(batchData.shape))
+                # imgTemp = batchData[index]
+                imgTemp = batchData.squeeze(0)  # ToDo because readImg is 4d not 3d (0th is useless)
+                # print('batchData[index]shape: {}'.format(imgTemp.shape))
                 # ime = imgTemp.crop((left, top, right, bottom))
-                #left, top, right, bottom = 300, 100, 650, 500
-                #print(onlyFileName)
-                #print(searchedValue)
-#                print('imgTemp: {}'.format(imgTemp.shape))
+                # left, top, right, bottom = 300, 100, 650, 500
+                # print(onlyFileName)
+                # print(searchedValue)
+                #                print('imgTemp: {}'.format(imgTemp.shape))
                 left, top, right, bottom = [int(float(i)) for i in row[2:6]]
                 imgCropped = imgTemp[:, top:bottom, left:right]
-                #print('imgCropped: {}'.format(imgCropped.shape))
-                #print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
+                # print('imgCropped: {}'.format(imgCropped.shape))
+                # print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
                 #                                                            imgTemp.size(2)))
-                #print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
+                # print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
                 foldSize = 150
                 step = 40
 
                 minFromXY = min([imgCropped.size(1), imgCropped.size(2)])
-                if (minFromXY< 150):
+                if (minFromXY < 150):
                     foldSize = minFromXY
-                    step = int (minFromXY / 5)
+                    step = int(minFromXY / 5)
 
-
-                #startTime = datetime.now()  # todo delete ME --time--
+                # startTime = datetime.now()  # todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 # imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
                 imgTempPatches = imgCropped.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
-                #print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
+                # print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
                 flate2 = torch.flatten(imgTempPatches, 0, 1)
-                #print('flate2.shape: {}'.format(flate2.shape))
-                #print('flate2[0].shape: {}'.format(flate2[0].shape))
+                # print('flate2.shape: {}'.format(flate2.shape))
+                # print('flate2[0].shape: {}'.format(flate2[0].shape))
                 # 100x100; 200x100; 300x100; 400x100
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
                 nnOutput = model(flate2)
@@ -294,11 +296,11 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
 
                     # print('{:.0f}'.format(prob2 * 100), end=";")
                 # ++++++++++ put flatted smallImages into NN +++++++++++++ #
-                #showExecutionTime(startTime)  # todo delete ME --time--
-                #print('maxName: "{}"'.format(maxName))
-                #print('maxVal: ({:.2f}%)'.format(maxVal * 100))
+                # showExecutionTime(startTime)  # todo delete ME --time--
+                # print('maxName: "{}"'.format(maxName))
+                # print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
-                showImgOnPlot(imgTemp, left+xBest, top+yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal)
+                showImgOnPlot(imgTemp, left + xBest, top + yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal)
 
                 # imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
                 # plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
@@ -308,7 +310,7 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
 
                 ############### ---------- folding images into SmallerImages ---------- ##############
 
-                #print('savedImage')
+                # print('savedImage')
                 index += 1
                 # predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
                 predictedClasses = torch.topk(item, k=2)[1].squeeze(0).tolist()
@@ -316,12 +318,12 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
                 for idx in predictedClasses:
                     label = labels_map[idx]
                     prob = torch.softmax(item, dim=0)[idx].item()
-                    #print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                    # print('{:<75} ({:.2f}%)'.format(label, prob * 100))
                     # maxName, maxVal = checkMax(maxName, maxVal, actFileNameWithPath, prob, label, idx)
-                    #return
-                #print('-----')
-            #print('maxName: "{}"'.format(maxName))
-            #print('maxVal: ({:.2f}%)'.format(maxVal * 100))
+                    # return
+                # print('-----')
+            # print('maxName: "{}"'.format(maxName))
+            # print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
 
 def SkipFirstCsvRow(listOfCsvRows):
@@ -334,14 +336,14 @@ def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, sco
         figure, axis = plt.subplots(1)
         # Display the image
         axis.imshow(imgCroppedToCup)
-        axis.text(left, top, '{:.2f}'.format(score*100), fontsize=10, color = 'lime')
+        axis.text(left, top, '{:.2f}'.format(score * 100), fontsize=10, color='lime')
         # Create a Rectangle patch
         # rect = patches.Rectangle((50, 100), 40, 30, linewidth=1, edgecolor='cyan', facecolor='none')
         rect = patches.Rectangle((left, top), width, height, linewidth=1, edgecolor='lime', facecolor='none')
         # plt.axis('off')
         # Add the patch to the Axes
         axis.add_patch(rect)
-        #plt.show()
+        # plt.show()
         plt.savefig('{}\detected\{}_D.png'.format(data_dir, onlyFileName))
         plt.close()
 
@@ -463,6 +465,29 @@ def UnNormalize(tensor):
     for t, m, s in zip(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
+
+
+def measureDatasetAccuracy(dataloader, device, model):
+    labels_map = json.load(open('Binary.txt'))
+    labels_map = [labels_map[str(i)] for i in range(2)]
+    print(labels_map)  # Todo DELETE ME
+    # Classify with EfficientNet
+    with torch.no_grad():
+        for data, target, paths in dataloader:
+            data, target = data.to(device), target.to(device)
+            print(target)
+            logits1 = model(data)
+            index = 0
+            for item in logits1:
+                print(paths[index])
+                index += 1
+                preds1 = torch.topk(item, k=2).indices.squeeze(0).tolist()
+                print(preds1)  # Todo DELETE ME
+                for idx in preds1:
+                    label = labels_map[idx]
+                    prob = torch.softmax(item, dim=0)[idx].item()
+                    print('{:<75} ({:.2f}%)'.format(label, prob * 100))
+                print('-----')
 
 
 if __name__ == '__main__':

@@ -2,7 +2,8 @@ import Augmentor
 
 
 def performAugmentation():
-    augImageDirectory = "jpgImages/aug/test"
+    #augImageDirectory = "jpgImages/aug/test"
+    augImageDirectory = "jpgImages/aug/moana"
     p = Augmentor.Pipeline(augImageDirectory)
     p.skew(probability=0.5)
     p.shear(probability=0.5, max_shear_left=10, max_shear_right=10)
