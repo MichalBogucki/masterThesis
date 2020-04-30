@@ -211,7 +211,7 @@ class EfficientNet(nn.Module):
     @classmethod
     def from_pretrained(cls, model_name, num_classes=1000, in_channels = 3):
         model = cls.from_name(model_name, override_params={'num_classes': num_classes})
-        load_pretrained_weights(model, model_name, load_fc=(num_classes == 2))
+        load_pretrained_weights(model, model_name, load_fc=(num_classes == 1000))
         if in_channels != 3:
             Conv2d = get_same_padding_conv2d(image_size = model._global_params.image_size)
             out_channels = round_filters(32, model._global_params)
@@ -223,8 +223,8 @@ class EfficientNet(nn.Module):
         model = cls.from_name(model_name, override_params={'num_classes': num_classes})
         if (num_classes==tuned_classes):
             print('num_classes: '+str(num_classes)+' == '+str(tuned_classes)+' :tunedClasses')
-        load_pretrained_weights_Disk(model, model_name, load_fc=(num_classes == 1000)) #todo for primare training
-        #load_pretrained_weights_Disk(model, model_name, load_fc=(num_classes == 2))  # todo for fineTuned
+        #load_pretrained_weights_Disk(model, model_name, load_fc=(num_classes == 1000)) #todo for primare training
+        load_pretrained_weights_Disk(model, model_name, load_fc=(num_classes == 2))  # todo for fineTuned
         if in_channels != 3:
             Conv2d = get_same_padding_conv2d(image_size = model._global_params.image_size)
             out_channels = round_filters(32, model._global_params)

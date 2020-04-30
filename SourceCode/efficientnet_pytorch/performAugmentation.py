@@ -15,6 +15,6 @@ def performAugmentation():
     p.rotate(probability=0.5, max_left_rotation=15, max_right_rotation=15)
     p.flip_left_right(probability=0.1)
     p.zoom_random(probability=0.4, percentage_area=0.85)
-    p.sample(1000)
+    p.sample(300)
     print("augemented")
     return

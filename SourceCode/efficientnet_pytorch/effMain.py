@@ -42,19 +42,22 @@ def main():
 
     # Training settings
     device = torch.device("cuda")
-    modelName = 'efficientnet-b0'
+    modelName = 'efficientnet-b0tuned_1000_moana_bigger'
+    # modelName = 'efficientnet-b0tuned_1000_moana' #ToDo with small samples
     # modelName = 'efficientnet-b0'
     # modelName = 'efficientnet-b4tuned'
+    # modelName = 'efficientnet-b0tuned_1000_moana_undersampling'
 
-    imageSize = EfficientNet.get_image_size(modelName)  # Todo for training
-    # imageSize = 576
+    #imageSize = EfficientNet.get_image_size(modelName)  # Todo for training
+    imageSize = 576 # Todo used for ImageLocalization
     print("imgSize " + str(imageSize))
 
     # Number of classes in the dataset
     num_PreLoad_Classes = 2
     num_tunedClasses = 2
     # Batch size for training (change depending on how much memory you have)
-    batch_size = 6
+    batch_size = 1
+    #batch_size = 60 # ToDo 60 for Classification, 2 for Localization
     # Number of epochs to train for
     num_epochs = 4
 
@@ -67,7 +70,7 @@ def main():
     # Preprocess image
     tfms = transforms.Compose([
         transforms.Resize(size=imageSize, interpolation=PIL.Image.BICUBIC),
-        transforms.CenterCrop(imageSize),
+        #transforms.CenterCrop(imageSize), #Todo uncomment for training
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
@@ -84,9 +87,9 @@ def main():
 
     # data_dir = "jpgImages/aug/val"#/tiny"
     # data_dir = "jpgImages/aug/train"
-    # data_dir = "UseMeMaui"
-    data_dir = "jpgImages/aug/val"
-
+    # data_dir = "UseMeMaui"  # ToDo use for ImageLocalization
+    data_dir = "jpgImages/aug/val" # Todo use for validation
+    # data_dir = "jpgImages/aug/train"
     # #$$$$$$$$$$ CSV USING $$$$$$$$$$$$
     # listOfCsvRows = ReadCsvToList(data_dir)
     # fileName ='jpgImages\\video\\frames\\moana_1080p_2min 004.jpg'
@@ -99,22 +102,20 @@ def main():
 
     dataset = ImageFolderWithPaths(data_dir, transform=tfms)  # our custom dataset
     datasetSize = len(dataset)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True,
-                                             num_workers=4, pin_memory=True)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, #Todo shuffle=True for training
+                                             num_workers=0, pin_memory=True)
 
     # return visualizeGraphWithOnnxToNetron(model) #ToDo ONYXX vizualiser
 
     # ---Binary---
-    # startTime = datetime.now()  # Todo deleteME
-    # measureDatasetAccuracy(dataloader, device, model)  # Todo UNCOMMENT ME
-    # showExecutionTime(startTime)  # Todo deleteME
-    # return
-    # return
-    # return
-
+    startTime = datetime.now()  # Todo deleteME
+    print('\n')
+    measureDatasetAccuracy(dataloader, device, model)  # Todo UNCOMMENT ME
+    validateBinaryTatoo(dataloader, device, model, data_dir, tfms)
     showExecutionTime(startTime)  # Todo deleteME
     if ('tuned' in modelName):
         return
+    # return
     # ---Binary---
 
     # ---labels_map---
@@ -168,14 +169,15 @@ def main():
     # ---------------------------------
 
     # ---Binary---
-    # validateBinaryTatoo(dataloader, device, model, data_dir, tfms) # Todo UNCOMMENT ME
+    measureDatasetAccuracy(dataloader, device, model)
     # ---Binary---
 
     # ---labels_map---
     # validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    #saveTrainedModel(model, modelName)  # Todo UNCOMMENT ME
+    saveTrainedModel(model, modelName)  # Todo UNCOMMENT ME
+    #saveTrainedModelFT(model_ft, modelName)  # Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
 
@@ -193,7 +195,8 @@ def SearchCollectionForValue(fileName, listOfCsvRows):
 
 def ReadCsvToList(data_dir):
     listOfCsvRows = []
-    with open('{}\detected.csv'.format(data_dir), 'r') as f:
+    with open('{}\detected.csv'.format(data_dir), 'r') as f: #ToDo for Maui
+    #with open('{}\detected_one_moana.csv'.format(data_dir), 'r') as f:  # ToDo for Moana
         # with open('{}\detected_single.csv'.format(data_dir), 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
@@ -202,6 +205,7 @@ def ReadCsvToList(data_dir):
 
 
 def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
+    data_dir = "UseMeMaui" #ToDo for Lozalization
     labels_map = json.load(open('Binary.txt'))
     labels_map = [labels_map[str(i)] for i in range(2)]
     # print(labels_map) #Todo DELETE ME
@@ -248,19 +252,28 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
                 # print(searchedValue)
                 #                print('imgTemp: {}'.format(imgTemp.shape))
                 left, top, right, bottom = [int(float(i)) for i in row[2:6]]
+                #print('left')
+                #print(left)
+                #print('top')
+                #print(top)
+                #print('right')
+                #print(right)
+                #print('bottom')
+                #print(bottom)
                 imgCropped = imgTemp[:, top:bottom, left:right]
                 # print('imgCropped: {}'.format(imgCropped.shape))
                 # print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
                 #                                                            imgTemp.size(2)))
                 # print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
-                foldSize = 150
-                step = 40
+                foldSize = 100
+                step = 15
 
                 minFromXY = min([imgCropped.size(1), imgCropped.size(2)])
                 if (minFromXY < 150):
                     foldSize = minFromXY
                     step = int(minFromXY / 5)
 
+                torch.cuda.empty_cache() #Todo empty cache
                 # startTime = datetime.now()  # todo delete ME --time--
                 ############### ---------- folding images into SmallerImages ---------- ##############
                 # imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
@@ -278,7 +291,7 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
                     # predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
                     predictedClasses2 = torch.topk(item2, k=2)[1].squeeze(0).tolist()
                     if (x2 > imgCropped.size(2)):
-                        # print('')
+                        #print('') #ToDo heatMap2
                         x2 = foldSize
                         y2 = (y2 + step)
                     for idx2 in predictedClasses2:
@@ -286,12 +299,12 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
                         prob2 = torch.softmax(item2, dim=0)[idx2].item()
                         tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2, prob2 * 100, (x2 - foldSize),
                                                                           (y2 - foldSize), x2, y2)
-                        # print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100))
+                        #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100)) #ToDo heatMap
                         maxName, maxVal, xBest, yBest = checkMax(maxName, maxVal, tempName, prob2, label2, idx2,
                                                                  xBest, yBest, x2 - foldSize, y2 - foldSize)
-                        # if (idx2 == 1):
-                        # print('{}x{}'.format(x2,y2), end=";")
-                        # print('{:.0f}'.format(prob2 * 100), end=";")
+                        #if (idx2 == 1):
+                            #print('{}x{}'.format(x2+left-foldSize,y2+top-foldSize), end=";") #ToDo heatMap2
+                            #print('{:.0f}'.format(prob2 * 100), end=";") #ToDo heatMap2
                     x2 = (x2 + step)
 
                     # print('{:.0f}'.format(prob2 * 100), end=";")
@@ -300,7 +313,7 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
                 # print('maxName: "{}"'.format(maxName))
                 # print('maxVal: ({:.2f}%)'.format(maxVal * 100))
 
-                showImgOnPlot(imgTemp, left + xBest, top + yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal)
+                showImgOnPlot(imgTemp, left + xBest, top + yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal, batchIteration)
 
                 # imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
                 # plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
@@ -330,8 +343,8 @@ def SkipFirstCsvRow(listOfCsvRows):
     return listOfCsvRows[1:]
 
 
-def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, score):
-    if (score * 100 > 65):
+def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, score, batchIteration):
+    if (score * 100 > 82):
         imgCroppedToCup = np.transpose(UnNormalize(imgTemp).cpu(), (1, 2, 0))
         figure, axis = plt.subplots(1)
         # Display the image
@@ -344,7 +357,9 @@ def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, sco
         # Add the patch to the Axes
         axis.add_patch(rect)
         # plt.show()
-        plt.savefig('{}\detected\{}_D.png'.format(data_dir, onlyFileName))
+        #plt.savefig('{}\detected\{}_D.png'.format(data_dir, onlyFileName)) #Todo ForMaui
+        #plt.savefig('{}\detected_Moana_bigger\{}_D.png'.format(data_dir, onlyFileName))  # Todo ForMoana
+        plt.savefig('{}\prog_87\{}_{}.png'.format(data_dir, onlyFileName,batchIteration))  # Todo ForMoana
         plt.close()
 
 
@@ -458,6 +473,9 @@ def set_parameter_requires_grad(model, feature_extracting):
 def saveTrainedModel(model, name):
     torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000.pth")
 
+
+def saveTrainedModelFT(model, name):
+    torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000_FT.pth")
 
 def UnNormalize(tensor):
     mean = (0.485, 0.456, 0.406)
