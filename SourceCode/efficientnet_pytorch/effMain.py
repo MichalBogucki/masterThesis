@@ -6,6 +6,8 @@ import torch.optim as optim
 import torch.nn as nn
 import os
 import csv
+import bisect
+from operator import itemgetter
 
 os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
 
@@ -17,6 +19,7 @@ os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
 from ImageFolderWithPaths import ImageFolderWithPaths
 # from ModelBinaryLayerAfterFC import ModelBinaryLayerAfterFC
 from setParserArguments import setParserArgumentsMnist
+from visualizeGraphWithOnnxToNetron import visualizeGraphWithOnnxToNetron
 from showExecutionTime import *
 from modelSourceCode import EfficientNet
 import torchvision
@@ -45,6 +48,7 @@ def main():
     modelName = 'efficientnet-b0tuned_1000_moana_bigger'
     # modelName = 'efficientnet-b0tuned_1000_moana' #ToDo with small samples
     # modelName = 'efficientnet-b0'
+    # modelName = 'efficientnet-b0tuned_1000_moana_5epoch'
     # modelName = 'efficientnet-b4tuned'
     # modelName = 'efficientnet-b0tuned_1000_moana_undersampling'
 
@@ -59,7 +63,7 @@ def main():
     batch_size = 1
     #batch_size = 60 # ToDo 60 for Classification, 2 for Localization
     # Number of epochs to train for
-    num_epochs = 4
+    num_epochs = 5
 
     model = EfficientNet.pretrained(modelName, num_classes=num_PreLoad_Classes, tuned_classes=num_tunedClasses).cuda()
     model.eval()
@@ -111,6 +115,8 @@ def main():
     startTime = datetime.now()  # Todo deleteME
     print('\n')
     measureDatasetAccuracy(dataloader, device, model)  # Todo UNCOMMENT ME
+    return
+    return
     validateBinaryTatoo(dataloader, device, model, data_dir, tfms)
     showExecutionTime(startTime)  # Todo deleteME
     if ('tuned' in modelName):
@@ -157,7 +163,7 @@ def main():
 
     criterion = nn.CrossEntropyLoss()
     dataloaders_dict = {
-        x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in
+        x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=0) for x in
         ['train', 'val']}
 
     # Train and evaluate
@@ -176,7 +182,7 @@ def main():
     # validateLabelsMap(model_ft, tfms)
     # ---labels_map---
 
-    saveTrainedModel(model, modelName)  # Todo UNCOMMENT ME
+    #saveTrainedModel(model, modelName)  # Todo UNCOMMENT ME
     #saveTrainedModelFT(model_ft, modelName)  # Todo UNCOMMENT ME
 
     showExecutionTime(startTime)
@@ -195,8 +201,8 @@ def SearchCollectionForValue(fileName, listOfCsvRows):
 
 def ReadCsvToList(data_dir):
     listOfCsvRows = []
-    with open('{}\detected.csv'.format(data_dir), 'r') as f: #ToDo for Maui
-    #with open('{}\detected_one_moana.csv'.format(data_dir), 'r') as f:  # ToDo for Moana
+    #with open('{}\detected.csv'.format(data_dir), 'r') as f: #ToDo for Maui
+    with open('{}\detected_one_moana.csv'.format(data_dir), 'r') as f:  # ToDo for Moana
         # with open('{}\detected_single.csv'.format(data_dir), 'r') as f:
         reader = csv.reader(f, delimiter=';')
         for row in reader:
@@ -234,109 +240,109 @@ def validateBinaryTatoo(dataloader, device, model, data_dir, tfms):
             # print('target')
             # print(target)
             # print('target.shape: {}'.format(target.shape))
-            logits1 = model(batchData)
             index = 0
             print('----- BATCH {}/{}-----'.format(batchIteration, batchesNumber))
             batchIteration += 1
-            for item in logits1:
-                # actFileNameWithPath = paths[index]
-                # onlyFileName = os.path.basename(actFileNameWithPath)
-                # searchedValue = SearchCollectionForValue(onlyFileName, listOfCsvRows)
-                # print('batchData.shape: {}'.format(batchData.shape))
-                # imgTemp = batchData[index]
-                imgTemp = batchData.squeeze(0)  # ToDo because readImg is 4d not 3d (0th is useless)
-                # print('batchData[index]shape: {}'.format(imgTemp.shape))
-                # ime = imgTemp.crop((left, top, right, bottom))
-                # left, top, right, bottom = 300, 100, 650, 500
-                # print(onlyFileName)
-                # print(searchedValue)
-                #                print('imgTemp: {}'.format(imgTemp.shape))
-                left, top, right, bottom = [int(float(i)) for i in row[2:6]]
-                #print('left')
-                #print(left)
-                #print('top')
-                #print(top)
-                #print('right')
-                #print(right)
-                #print('bottom')
-                #print(bottom)
-                imgCropped = imgTemp[:, top:bottom, left:right]
-                # print('imgCropped: {}'.format(imgCropped.shape))
-                # print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
-                #                                                            imgTemp.size(2)))
-                # print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
-                foldSize = 100
-                step = 15
+            # actFileNameWithPath = paths[index]
+            # onlyFileName = os.path.basename(actFileNameWithPath)
+            # searchedValue = SearchCollectionForValue(onlyFileName, listOfCsvRows)
+            # print('batchData.shape: {}'.format(batchData.shape))
+            # imgTemp = batchData[index]
+            imgTemp = batchData.squeeze(0)  # ToDo because readImg is 4d not 3d (0th is useless)
+            # print('batchData[index]shape: {}'.format(imgTemp.shape))
+            # ime = imgTemp.crop((left, top, right, bottom))
+            # left, top, right, bottom = 300, 100, 650, 500
+            # print(onlyFileName)
+            # print(searchedValue)
+            #                print('imgTemp: {}'.format(imgTemp.shape))
+            left, top, right, bottom = [int(float(i)) for i in row[2:6]]
+            #print('left')
+            #print(left)
+            #print('top')
+            #print(top)
+            #print('right')
+            #print(right)
+            #print('bottom')
+            #print(bottom)
+            imgCropped = imgTemp[:, top:bottom, left:right]
+            # print('imgCropped: {}'.format(imgCropped.shape))
+            # print('img.size(0)={}, img.size(1)={} img.size(2)={} '.format(imgTemp.size(0), imgTemp.size(1),
+            #                                                            imgTemp.size(2)))
+            # print('{}/{} "{}"'.format(index + 1, len(logits1), actFileNameWithPath))
+            foldSize = 100
+            step = 15
 
-                minFromXY = min([imgCropped.size(1), imgCropped.size(2)])
-                if (minFromXY < 150):
-                    foldSize = minFromXY
-                    step = int(minFromXY / 5)
+            minFromXY = min([imgCropped.size(1), imgCropped.size(2)])
+            if (minFromXY < 150):
+                foldSize = minFromXY
+                step = int(minFromXY / 5)
 
-                torch.cuda.empty_cache() #Todo empty cache
-                # startTime = datetime.now()  # todo delete ME --time--
-                ############### ---------- folding images into SmallerImages ---------- ##############
-                # imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
-                imgTempPatches = imgCropped.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
-                # print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
-                flate2 = torch.flatten(imgTempPatches, 0, 1)
-                # print('flate2.shape: {}'.format(flate2.shape))
-                # print('flate2[0].shape: {}'.format(flate2[0].shape))
-                # 100x100; 200x100; 300x100; 400x100
-                # ++++++++++ put flatted smallImages into NN +++++++++++++ #
-                nnOutput = model(flate2)
-                x2 = foldSize
-                y2 = foldSize
-                for item2 in nnOutput:
-                    # predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
-                    predictedClasses2 = torch.topk(item2, k=2)[1].squeeze(0).tolist()
-                    if (x2 > imgCropped.size(2)):
-                        #print('') #ToDo heatMap2
-                        x2 = foldSize
-                        y2 = (y2 + step)
-                    for idx2 in predictedClasses2:
+            torch.cuda.empty_cache() #Todo empty cache
+            # startTime = datetime.now()  # todo delete ME --time--
+            ############### ---------- folding images into SmallerImages ---------- ##############
+            # imgTempPatches = imgTemp.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+            imgTempPatches = imgCropped.unfold(0, 3, 3).unfold(1, foldSize, step).unfold(2, foldSize, step).squeeze(0)
+            # print('imgTempPatches.shape: {}'.format(imgTempPatches.shape))
+            flate2 = torch.flatten(imgTempPatches, 0, 1)
+            # print('flate2.shape: {}'.format(flate2.shape))
+            # print('flate2[0].shape: {}'.format(flate2[0].shape))
+            # 100x100; 200x100; 300x100; 400x100
+            # ++++++++++ put flatted smallImages into NN +++++++++++++ #
+            nnOutput = model(flate2)
+            x2 = foldSize
+            y2 = foldSize
+            orderedList = []
+            #print('---- TOP prediction ----')  # ToDo heatMap2
+            for item2 in nnOutput:
+                # predictedClasses2 = torch.topk(item2, k=2).indices.squeeze(0).tolist()
+                predictedClasses2 = torch.topk(item2, k=2)[1].squeeze(0).tolist()
+                if (x2 > imgCropped.size(2)):
+                    #print('') #ToDo heatMap2
+                    x2 = foldSize
+                    y2 = (y2 + step)
+                for idx2 in predictedClasses2:
+                    if (idx2 == 1):
+                        xLeft = x2-foldSize+left
+                        yTop = y2-foldSize+top
                         label2 = labels_map[idx2]
                         prob2 = torch.softmax(item2, dim=0)[idx2].item()
-                        tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2, prob2 * 100, (x2 - foldSize),
-                                                                          (y2 - foldSize), x2, y2)
+                        tempName = '{} ({}) x={} y={} x2={} y2={}'.format(label2, prob2 * 100, (xLeft),
+                                                                          (yTop), x2, y2)
                         #print('{} x={} y={} {:<75} ({:.2f}%)'.format(label2,x2, y2, label2, prob2 * 100)) #ToDo heatMap
                         maxName, maxVal, xBest, yBest = checkMax(maxName, maxVal, tempName, prob2, label2, idx2,
-                                                                 xBest, yBest, x2 - foldSize, y2 - foldSize)
-                        #if (idx2 == 1):
-                            #print('{}x{}'.format(x2+left-foldSize,y2+top-foldSize), end=";") #ToDo heatMap2
-                            #print('{:.0f}'.format(prob2 * 100), end=";") #ToDo heatMap2
-                    x2 = (x2 + step)
+                                                                 xBest, yBest, xLeft, yTop)
+                        print('')  # ToDo heatMap2
+                        print('x{};y{};{:.0f}'.format(xLeft, yTop,prob2 * 100), end=";")  # ToDo heatMap2
+                        aTuple = (xLeft, yTop, prob2 * 100)
+                        orderedList.append(aTuple)
+                        # if (prob2 * 100 > 94):
+                        #     print('loop')  # ToDo heatMap2 in new line
+                        #     print('x{}_y{}'.format(xLeft,yTop), end=";") #ToDo heatMap2
+                        #     print('{:.0f}'.format(prob2 * 100), end=";") #ToDo heatMap2
+                x2 = (x2 + step)
 
-                    # print('{:.0f}'.format(prob2 * 100), end=";")
-                # ++++++++++ put flatted smallImages into NN +++++++++++++ #
-                # showExecutionTime(startTime)  # todo delete ME --time--
-                # print('maxName: "{}"'.format(maxName))
-                # print('maxVal: ({:.2f}%)'.format(maxVal * 100))
-
-                showImgOnPlot(imgTemp, left + xBest, top + yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal, batchIteration)
-
-                # imgFromTensor = np.transpose(flate2[0].cpu(), (1,2,0))
-                # plt.imshow((imgFromTensor.astype('uint8')), interpolation='bicubic')
-                # transforms.ToPILImage()(transforms.ToTensor()(image)), interpolation = "bicubic"
-                # plt.show()
-                # torchvision.utils.save_image(imgFromTensor, 'flate2.png')
-
-                ############### ---------- folding images into SmallerImages ---------- ##############
-
-                # print('savedImage')
-                index += 1
-                # predictedClasses = torch.topk(item, k=2).indices.squeeze(0).tolist()
-                predictedClasses = torch.topk(item, k=2)[1].squeeze(0).tolist()
-                # print(predictedClasses)  # Todo DELETE ME
-                for idx in predictedClasses:
-                    label = labels_map[idx]
-                    prob = torch.softmax(item, dim=0)[idx].item()
-                    # print('{:<75} ({:.2f}%)'.format(label, prob * 100))
-                    # maxName, maxVal = checkMax(maxName, maxVal, actFileNameWithPath, prob, label, idx)
-                    # return
-                # print('-----')
+                #print('{:.0f}'.format(prob2 * 100), end=";")
+            # ++++++++++ put flatted smallImages into NN +++++++++++++ #
+            # showExecutionTime(startTime)  # todo delete ME --time--
             # print('maxName: "{}"'.format(maxName))
             # print('maxVal: ({:.2f}%)'.format(maxVal * 100))
+
+            # if (maxVal * 100 > 94):
+            #     print('save')  # ToDo heatMap2 in new line
+            #     print('x{}_y{}'.format(left + xBest, top + yBest), end=";")  # ToDo heatMap2
+            #     print('{:.0f}'.format(maxVal * 100), end=";")  # ToDo heatMap2
+
+            # showImgOnPlot(imgTemp, xBest, yBest, foldSize, foldSize, data_dir, onlyFileName, maxVal, batchIteration) #ToDO saveImageToFile
+            # print('savedImage')
+            # PrintTopTen(orderedList) #ToDO printTopTenResults
+
+
+def PrintTopTen(orderedList):
+    print('\n---Top 10---')
+    orderedList.sort(key=lambda x: x[2], reverse=True)
+    topTen = orderedList[:10]
+    for listItem in topTen:
+        print('\nx{};y{};{:.0f}'.format(listItem[0], listItem[1], listItem[2]), end=";")
 
 
 def SkipFirstCsvRow(listOfCsvRows):
@@ -344,7 +350,10 @@ def SkipFirstCsvRow(listOfCsvRows):
 
 
 def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, score, batchIteration):
-    if (score * 100 > 82):
+    if (score * 100 > 94):
+        #print('\n\nINSIDE')  # ToDo heatMap2 in new line
+        #print('x{}_y{}'.format(left, top), end=";")  # ToDo heatMap2
+        #print('{:.0f}'.format(score * 100), end=";")  # ToDo heatMap2
         imgCroppedToCup = np.transpose(UnNormalize(imgTemp).cpu(), (1, 2, 0))
         figure, axis = plt.subplots(1)
         # Display the image
@@ -359,7 +368,7 @@ def showImgOnPlot(imgTemp, left, top, width, height, data_dir, onlyFileName, sco
         # plt.show()
         #plt.savefig('{}\detected\{}_D.png'.format(data_dir, onlyFileName)) #Todo ForMaui
         #plt.savefig('{}\detected_Moana_bigger\{}_D.png'.format(data_dir, onlyFileName))  # Todo ForMoana
-        plt.savefig('{}\prog_87\{}_{}.png'.format(data_dir, onlyFileName,batchIteration))  # Todo ForMoana
+        plt.savefig('{}\prog_92_transposed\{}_{}.png'.format(data_dir, onlyFileName,batchIteration))  # Todo ForMoana
         plt.close()
 
 
@@ -471,7 +480,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 
 
 def saveTrainedModel(model, name):
-    torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000.pth")
+    torch.save(model.state_dict(), "savedModel/" + name + "tuned_1000_5epoch.pth")
 
 
 def saveTrainedModelFT(model, name):
